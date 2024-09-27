@@ -3,6 +3,7 @@
 #include "Plane.h"
 #include "Enemy.h"
 #include "GameUtilities.h"
+#include "Terrain.h"
 
 
 int main()
@@ -30,6 +31,9 @@ int main()
     camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
+    Terrain terrain;
+    terrain.Initialize();
+
     // Main game loop
     while (!WindowShouldClose())
     {
@@ -42,6 +46,9 @@ int main()
 
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
+
+        //update the terrain
+        terrain.Update(player.GetPosition());
 
         // Update the camera to follow the player without smoothing
         Vector3 cameraOffset = { 0.0f, -5.0f, -15.0f };// Adjusted offset values
@@ -70,6 +77,9 @@ int main()
             ClearBackground(BLACK);
 
             BeginMode3D(camera);
+
+                // Draw Terrain
+                terrain.Draw();
 
                 // Draw the player
                 player.Draw();
@@ -112,6 +122,7 @@ int main()
 
     // De-initialization
     player.Unload();
+    terrain.Unload();
     CloseWindow();
 
     return 0;

@@ -1,4 +1,5 @@
 #include "Plane.h"
+#include "GameSettings.h"
 #include <iostream>
 
 Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition)
@@ -28,8 +29,6 @@ Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vecto
 
 Plane::~Plane()
 {
-    // UnloadModel(model);
-    // UnloadTexture(texture);
 }
 
 void Plane::SetPosition(const Vector3& newPosition)
@@ -69,41 +68,41 @@ void Plane::HandleInput(float deltaTime)
 {
     // Adjust pitch (X-axis rotation)
     if (IsKeyDown(KEY_UP)) { 
-        flightInfo.pitch -= 60.0f * deltaTime; 
-        if(flightInfo.pitch <= -50.0f)
-            flightInfo.pitch = -50.0f;
+        flightInfo.pitch -= ROLL_PITCH_CONSTANT * deltaTime; 
+        if(flightInfo.pitch <= MIN_ROLL_PITCH_VALUE)
+            flightInfo.pitch = MIN_ROLL_PITCH_VALUE;
         flightInfo.altitude += flightInfo.speed * deltaTime; 
     }
     else if (IsKeyDown(KEY_DOWN)) { 
-        flightInfo.pitch += 60.0f * deltaTime; 
-        if(flightInfo.pitch >= 50.0f)
-            flightInfo.pitch = 50.0f;
+        flightInfo.pitch += ROLL_PITCH_CONSTANT * deltaTime; 
+        if(flightInfo.pitch >= MAX_ROLL_PITCH_VALUE)
+            flightInfo.pitch = MAX_ROLL_PITCH_VALUE;
         flightInfo.altitude -= flightInfo.speed * deltaTime; 
     }
     else
     {
-        if (flightInfo.pitch > 3.0f) flightInfo.pitch -= 30.0f * deltaTime;
-        else if (flightInfo.pitch < -3.0f) flightInfo.pitch += 30.0f * deltaTime;
+        if (flightInfo.pitch > 3.0f) flightInfo.pitch -= ROLL_PITCH_CONSTANT * deltaTime;
+        else if (flightInfo.pitch < -3.0f) flightInfo.pitch += ROLL_PITCH_CONSTANT * deltaTime;
     }
 
     // Adjust roll (Z-axis rotation) and horizontal movement
     float turningValue = 0.0f;
     if (IsKeyDown(KEY_LEFT)) { 
-        flightInfo.roll -= 60.0f * deltaTime; 
-        if(flightInfo.roll <= -50.0f)
-            flightInfo.roll = -50.0f;
+        flightInfo.roll -= ROLL_PITCH_CONSTANT * deltaTime; 
+        if(flightInfo.roll <= MIN_ROLL_PITCH_VALUE)
+            flightInfo.roll = MIN_ROLL_PITCH_VALUE;
         turningValue -= flightInfo.speed * deltaTime; 
     }
     else if (IsKeyDown(KEY_RIGHT)) { 
-        flightInfo.roll += 60.0f * deltaTime;
-        if(flightInfo.roll >= 50.0f)
-            flightInfo.roll = 50.0f; 
+        flightInfo.roll += ROLL_PITCH_CONSTANT * deltaTime;
+        if(flightInfo.roll >= MAX_ROLL_PITCH_VALUE)
+            flightInfo.roll = MAX_ROLL_PITCH_VALUE; 
         turningValue += flightInfo.speed * deltaTime; 
     }
     else
     {
-        if (flightInfo.roll > 6.0f * deltaTime) flightInfo.roll -= 60.0f * deltaTime;
-        else if (flightInfo.roll < -6.0f * deltaTime) flightInfo.roll += 60.0f * deltaTime;
+        if (flightInfo.roll > 6.0f * deltaTime) flightInfo.roll -= ROLL_PITCH_CONSTANT * deltaTime;
+        else if (flightInfo.roll < -6.0f * deltaTime) flightInfo.roll += ROLL_PITCH_CONSTANT * deltaTime;
     }
 
     // Update position based on turning value
