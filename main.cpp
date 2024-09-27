@@ -73,7 +73,6 @@ int main()
 
                 // Draw the player
                 player.Draw();
-                //DrawModel(player.GetModel(), player.GetPosition(), player.GetScale(), WHITE);
 
                 for (auto& enemy : enemies)
                 {

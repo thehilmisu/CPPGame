@@ -68,8 +68,18 @@ FlightInfo Plane::GetFlightInfo()
 void Plane::HandleInput(float deltaTime)
 {
     // Adjust pitch (X-axis rotation)
-    if (IsKeyDown(KEY_UP)) { flightInfo.pitch -= 60.0f * deltaTime; flightInfo.altitude += flightInfo.speed * deltaTime; }
-    else if (IsKeyDown(KEY_DOWN)) { flightInfo.pitch += 60.0f * deltaTime; flightInfo.altitude -= flightInfo.speed * deltaTime; }
+    if (IsKeyDown(KEY_UP)) { 
+        flightInfo.pitch -= 60.0f * deltaTime; 
+        if(flightInfo.pitch <= -50.0f)
+            flightInfo.pitch = -50.0f;
+        flightInfo.altitude += flightInfo.speed * deltaTime; 
+    }
+    else if (IsKeyDown(KEY_DOWN)) { 
+        flightInfo.pitch += 60.0f * deltaTime; 
+        if(flightInfo.pitch >= 50.0f)
+            flightInfo.pitch = 50.0f;
+        flightInfo.altitude -= flightInfo.speed * deltaTime; 
+    }
     else
     {
         if (flightInfo.pitch > 3.0f) flightInfo.pitch -= 30.0f * deltaTime;
@@ -78,8 +88,18 @@ void Plane::HandleInput(float deltaTime)
 
     // Adjust roll (Z-axis rotation) and horizontal movement
     float turningValue = 0.0f;
-    if (IsKeyDown(KEY_LEFT)) { flightInfo.roll -= 60.0f * deltaTime; turningValue -= flightInfo.speed * deltaTime; }
-    else if (IsKeyDown(KEY_RIGHT)) { flightInfo.roll += 60.0f * deltaTime; turningValue += flightInfo.speed * deltaTime; }
+    if (IsKeyDown(KEY_LEFT)) { 
+        flightInfo.roll -= 60.0f * deltaTime; 
+        if(flightInfo.roll <= -50.0f)
+            flightInfo.roll = -50.0f;
+        turningValue -= flightInfo.speed * deltaTime; 
+    }
+    else if (IsKeyDown(KEY_RIGHT)) { 
+        flightInfo.roll += 60.0f * deltaTime;
+        if(flightInfo.roll >= 50.0f)
+            flightInfo.roll = 50.0f; 
+        turningValue += flightInfo.speed * deltaTime; 
+    }
     else
     {
         if (flightInfo.roll > 6.0f * deltaTime) flightInfo.roll -= 60.0f * deltaTime;
