@@ -3,7 +3,6 @@
 Enemy::Enemy(Vector3 startPosition, Vector3 size)
     : position(startPosition), size(size), active(true)
 {
-    // Assign a random color or use a predefined one
     color = RED;
 }
 
@@ -12,10 +11,10 @@ Enemy::~Enemy()
     // Cleanup if necessary
 }
 
-void Enemy::Update(float deltaTime, Vector3 target)
+void Enemy::Update(float deltaTime, Vector3 targetPosition)
 {
-   float smoothFactor = 1.0f * deltaTime;
-   position = Vector3Lerp(position,Vector3Add(position, Vector3MoveTowards(position, target, 3)), smoothFactor);
+   float smoothFactor = 2.0f * deltaTime;
+   position = Vector3MoveTowards(position, Vector3Lerp(position, targetPosition, smoothFactor), 2);
 }
 
 void Enemy::Draw()

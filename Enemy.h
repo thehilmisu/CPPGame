@@ -10,7 +10,7 @@ public:
     Enemy(Vector3 startPosition, Vector3 size);
     ~Enemy();
 
-    void Update(float deltaTime, Vector3 target);
+    void Update(float deltaTime, Vector3 targetPosition);
     void Draw();
 
     Vector3 GetPosition() const;

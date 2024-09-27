@@ -1,10 +1,9 @@
 #include "Plane.h"
 #include <iostream>
 
-
 Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition)
     : position(startPosition), rotation(QuaternionIdentity()), scale(1.0f), isFlipped(true),
-      pitch(0.0f), yaw(0.0f), roll(0.0f), altitude(startPosition.y), speed(5.0f)
+      flightInfo{0.0f, 0.0f, 0.0f, startPosition.y, 5.0f}
 {
     // Load the model
     model = LoadModel(modelPath.c_str());
@@ -24,7 +23,7 @@ Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vecto
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
     // Initialize the transform
-    UpdateTransform();
+    UpdateRotation();
 }
 
 Plane::~Plane()
@@ -36,6 +35,7 @@ Plane::~Plane()
 void Plane::SetPosition(const Vector3& newPosition)
 {
     position = newPosition;
+    UpdateRotation();
 }
 
 Vector3 Plane::GetPosition()
@@ -43,19 +43,10 @@ Vector3 Plane::GetPosition()
     return position;
 }
 
-void Plane::SetRotation(const Quaternion& newRotation)
-{
-    rotation = newRotation;
-}
-
-Quaternion Plane::GetRotation() const
-{
-    return rotation;
-}
-
 void Plane::SetScale(const float& newScale)
 {
     scale = newScale;
+    UpdateRotation();
 }
 
 float Plane::GetScale() const
@@ -66,151 +57,101 @@ float Plane::GetScale() const
 void Plane::SetFlipped(bool flipped)
 {
     isFlipped = flipped;
+    UpdateRotation();
 }
 
-bool Plane::GetFlipped()
+FlightInfo Plane::GetFlightInfo()
 {
-    return isFlipped;
-}
-
-Model Plane::GetModel(){
-    return model;
+    return flightInfo;
 }
 
 void Plane::HandleInput(float deltaTime)
 {
     // Adjust pitch (X-axis rotation)
-    if (IsKeyDown(KEY_DOWN)) { pitch += 60.0f * deltaTime; altitude -= speed * deltaTime; }
-    else if (IsKeyDown(KEY_UP)) { pitch -= 60.0f * deltaTime; altitude += speed * deltaTime; }
+    if (IsKeyDown(KEY_UP)) { flightInfo.pitch -= 60.0f * deltaTime; flightInfo.altitude += flightInfo.speed * deltaTime; }
+    else if (IsKeyDown(KEY_DOWN)) { flightInfo.pitch += 60.0f * deltaTime; flightInfo.altitude -= flightInfo.speed * deltaTime; }
     else
     {
-        if (pitch > 3.0f) pitch -= 30.0f * deltaTime;
-        else if (pitch < -3.0f) pitch += 30.0f * deltaTime;
-    }
-
-    // Adjust yaw (Y-axis rotation)
-    if (IsKeyDown(KEY_A)) yaw += 60.0f * deltaTime;
-    else if (IsKeyDown(KEY_S)) yaw -= 60.0f * deltaTime;
-    else
-    {
-        if (yaw > 0.0f) yaw -= 50.0f * deltaTime;
-        else if (yaw < 0.0f) yaw += 50.0f * deltaTime;
+        if (flightInfo.pitch > 3.0f) flightInfo.pitch -= 30.0f * deltaTime;
+        else if (flightInfo.pitch < -3.0f) flightInfo.pitch += 30.0f * deltaTime;
     }
 
     // Adjust roll (Z-axis rotation) and horizontal movement
     float turningValue = 0.0f;
-    if (IsKeyDown(KEY_RIGHT)) { roll -= 60.0f * deltaTime; turningValue += speed * deltaTime; }
-    else if (IsKeyDown(KEY_LEFT)) { roll += 60.0f * deltaTime; turningValue -= speed * deltaTime; }
+    if (IsKeyDown(KEY_LEFT)) { flightInfo.roll -= 60.0f * deltaTime; turningValue -= flightInfo.speed * deltaTime; }
+    else if (IsKeyDown(KEY_RIGHT)) { flightInfo.roll += 60.0f * deltaTime; turningValue += flightInfo.speed * deltaTime; }
     else
     {
-        if (roll > 6.0f * deltaTime) roll -= 60.0f * deltaTime;
-        else if (roll < -6.0f * deltaTime) roll += 60.0f * deltaTime;
+        if (flightInfo.roll > 6.0f * deltaTime) flightInfo.roll -= 60.0f * deltaTime;
+        else if (flightInfo.roll < -6.0f * deltaTime) flightInfo.roll += 60.0f * deltaTime;
     }
 
     // Update position based on turning value
     position.x += turningValue;
 
     // Update altitude
-    position.y = altitude;
+    position.y = flightInfo.altitude;
 
     // Update the player's rotation based on pitch, yaw, and roll
     UpdateRotation();
 }
 
-// Update method
 void Plane::Update(float deltaTime)
 {
-    // Additional updates if necessary
+    // Handle input and update plane state
     HandleInput(deltaTime);
 }
 
-// Draw method
-void Plane::Draw()
+void Plane::UpdateRotation()
 {
-    // Draw the model with its transform
-    DrawModel(model, GetPosition(), 1.0f, WHITE);
+    // Convert pitch, yaw, and roll from degrees to radians
+    float pitchRad = DEG2RAD * flightInfo.pitch;
+    float yawRad = DEG2RAD * flightInfo.yaw;
+    float rollRad = DEG2RAD * flightInfo.roll;
+
+    // Create rotation matrices for pitch, yaw, and roll
+    Matrix pitchMat = MatrixRotateX(pitchRad);
+    Matrix yawMat = MatrixRotateY(yawRad);
+    Matrix rollMat = MatrixRotateZ(rollRad);
+
+    // Combine rotations: roll * pitch * yaw
+    Matrix rotationMat = MatrixMultiply(rollMat, MatrixMultiply(pitchMat, yawMat));
+
+    // Apply flipping if necessary
+    if (isFlipped)
+    {
+        Matrix flipMat = MatrixRotateY(PI); // Rotate 180 degrees around Y-axis
+        rotationMat = MatrixMultiply(rotationMat, flipMat);
+    }
+
+    // Create scaling matrix
+    Matrix scaleMat = MatrixScale(scale, scale, scale);
+
+    // Combine scaling and rotation
+    Matrix transformMat = MatrixMultiply(scaleMat, rotationMat);
+
+    // Create translation matrix
+    Matrix translationMat = MatrixTranslate(position.x, position.y, position.z);
+
+    // Combine all transformations: translation * rotation * scaling
+    model.transform = MatrixMultiply(transformMat, translationMat);
 }
 
-void Plane::LookAt(const Vector3& targetPosition)
+void Plane::Draw()
 {
-    // Calculate the direction vector from the player to the target in the XZ plane
-    Vector3 direction = {
-        targetPosition.x - position.x,
-        0.0f, // Ignore Y-axis to prevent vertical rotation
-        targetPosition.z - position.z
-    };
-
-    // Normalize the direction vector
-    direction = Vector3Normalize(direction);
-
-    // Calculate the yaw angle (rotation around Y-axis)
-    float targetYaw = atan2f(direction.x, direction.z);
-
-    // Convert yaw from radians to degrees
-    float targetYawDegrees = RAD2DEG * targetYaw;
-
-    // Set the player's rotation around the Y-axis
-    rotation = QuaternionFromEuler(0.0f, targetYawDegrees * DEG2RAD, 0.0f);
-
-    // Update the transform matrix
-    UpdateTransform();
+    // Draw the model at the origin; transformations are applied via model.transform
+    DrawModel(model, { 0.0f, 0.0f, 0.0f }, 1.0f, WHITE);
 }
 
 void Plane::Move(const Vector3& direction, float speed, float deltaTime)
 {
     Vector3 movement = Vector3Scale(direction, speed * deltaTime);
     position = Vector3Add(position, movement);
-
-    UpdateTransform();
+    UpdateRotation();
 }
 
-void Plane::Rotate(const Vector3& axis, float angleDegrees)
+void Plane::Unload()
 {
-    Quaternion q = QuaternionFromAxisAngle(axis, DEG2RAD * angleDegrees);
-    rotation = QuaternionNormalize(QuaternionMultiply(q, rotation));
-    UpdateTransform();
-}
-
-
-// Update rotation based on pitch, yaw, and roll
-void Plane::UpdateRotation()
-{
-    // Convert pitch, yaw, and roll from degrees to radians
-    float pitchRad = DEG2RAD * pitch;
-    float yawRad = DEG2RAD * yaw;
-    float rollRad = DEG2RAD * roll;
-
-    // Create rotation quaternion from Euler angles
-    Quaternion qPitch = QuaternionFromEuler(pitchRad, 0.0f, 0.0f);
-    Quaternion qYaw = QuaternionFromEuler(0.0f, yawRad, 0.0f);
-    Quaternion qRoll = QuaternionFromEuler(0.0f, 0.0f, rollRad);
-
-    // Combine rotations: yaw * pitch * roll
-    rotation = QuaternionMultiply(qYaw, QuaternionMultiply(qPitch, qRoll));
-
-    // Update the transform matrix
-    UpdateTransform();
-}
-
-void Plane::UpdateTransform()
-{
-    Matrix scaleMat = MatrixScale(scale, scale, scale);
-    Matrix rotMat = QuaternionToMatrix(rotation);
-
-    if(isFlipped){
-        // Apply an additional rotation to flip the model
-        Matrix adjustMat = MatrixRotateY(PI); // Rotate 180 degrees around Y-axis
-        rotMat = MatrixMultiply(adjustMat, rotMat);
-    }
-
-
-    Matrix transMat = MatrixTranslate(position.x, position.y, position.z);
-
-    // Combine transformations: Translation * Rotation * Scale
-    model.transform = MatrixMultiply(transMat, MatrixMultiply(rotMat, scaleMat));
-}
-
-void Plane::Unload() {
     UnloadModel(model);
     UnloadTexture(texture);
 }

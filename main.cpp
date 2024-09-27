@@ -2,31 +2,8 @@
 #include <vector>
 #include "Plane.h"
 #include "Enemy.h"
-#include "GameSettings.h"
 #include "GameUtilities.h"
 
-
-void SpawnEnemy(const Vector3 playerPosition, std::vector<Enemy>& enemies)
-{
-    if (enemies.size() >= ENEMY_MAX_COUNT)
-    {
-        // Don't spawn more than the maximum number of enemies
-        return;
-    }
-
-    // Random X and Y within specified ranges
-    float randomX = playerPosition.x + ((rand() % 1000 / 1000.0f) * ENEMY_SPAWN_RANGE_X * 2) - ENEMY_SPAWN_RANGE_X;
-    float randomY = playerPosition.y + ((rand() % 1000 / 1000.0f) * ENEMY_SPAWN_RANGE_Y * 2) - ENEMY_SPAWN_RANGE_Y;
-
-    // Z position ahead of the player
-    float spawnZ = playerPosition.z - ENEMY_SPAWN_DISTANCE;  // Assuming negative Z is forward
-
-    Vector3 spawnPosition = { randomX, randomY, spawnZ };
-    Vector3 enemySize = { ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE };
-
-    // Create a new enemy and add it to the list
-    enemies.emplace_back(spawnPosition, enemySize);
-}
 
 int main()
 {
@@ -59,16 +36,19 @@ int main()
         // Update
         float deltaTime = GetFrameTime();
 
-        // Update the player
+      
+        // Move the player forward first
+        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+
+        // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
 
         // Update the camera to follow the player without smoothing
-
-        Vector3 cameraOffset = { 0.0f, 5.0f, 15.0f };// Adjusted offset values
-        float smoothFactor = 15.0f * deltaTime / 5.0f; // Increase smooth factor
-        camera.position = Vector3Lerp(camera.position, Vector3Add(player.GetPosition(), cameraOffset), smoothFactor);
+        Vector3 cameraOffset = { 0.0f, -5.0f, -15.0f };// Adjusted offset values
+        float smoothFactor = 15.0f * deltaTime; // Increase smooth factor
+        //camera.position = Vector3Lerp(Vector3Subtract(player.GetPosition(), cameraOffset), player.GetPosition(), smoothFactor);
+        camera.position = Vector3Subtract(player.GetPosition(), cameraOffset);
         camera.target = player.GetPosition();
-
 
         // Update enemy spawning
         enemySpawnTimer += deltaTime;
@@ -76,7 +56,7 @@ int main()
         if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
         {
             enemySpawnTimer = 0.0f;
-            SpawnEnemy(player.GetPosition(), enemies);
+            GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
         }
 
         // Update enemies
@@ -87,13 +67,13 @@ int main()
 
         // Draw
         BeginDrawing();
-            ClearBackground(RAYWHITE);
+            ClearBackground(BLACK);
 
             BeginMode3D(camera);
 
                 // Draw the player
                 player.Draw();
-                //player.Move({0.0f,0.0f,-1.0f}, 5.0f, deltaTime);
+                //DrawModel(player.GetModel(), player.GetPosition(), player.GetScale(), WHITE);
 
                 for (auto& enemy : enemies)
                 {
@@ -101,12 +81,32 @@ int main()
                 }
 
                 // Draw grid
-                //DrawInfiniteGrid(1.0f, (Vector3){ player.GetPosition().x, 0.0f, player.GetPosition().z });
                 DrawGrid(50, 10);
 
             EndMode3D();
 
             // Draw UI elements...
+            FlightInfo info = player.GetFlightInfo();
+            DrawRectangle(5, 45, 250, 110, Fade(SKYBLUE, 0.5f));
+            DrawRectangleLines(5, 45, 250, 110, BLUE);
+            char buffer[128];
+            sprintf(buffer, "Speed: %.2f units/s", info.speed);
+            DrawText(buffer, 10, 50, 15, BLACK);
+            sprintf(buffer, "Altitude: %f ", info.altitude);
+            DrawText(buffer, 10, 70, 15, BLACK);
+            sprintf(buffer, "Pitch: %f ", info.pitch);
+            DrawText(buffer, 10, 90, 15, BLACK);
+            sprintf(buffer, "Roll: %f ", info.roll);
+            DrawText(buffer, 10, 110, 15, BLACK);
+            sprintf(buffer, "Yaw: %f ", info.yaw);
+            DrawText(buffer, 10, 130, 15, BLACK);
+
+            sprintf(buffer, "Plane : %f, %f, %f", player.GetPosition().x,player.GetPosition().y,player.GetPosition().z);
+            DrawText(buffer, 10, 160, 15, WHITE);
+
+            sprintf(buffer, "Camera: %f, %f, %f", camera.position.x,camera.position.y,camera.position.z);
+            DrawText(buffer, 10, 190, 15, WHITE);
+
 
         EndDrawing();
     }

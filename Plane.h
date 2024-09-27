@@ -5,6 +5,14 @@
 #include "raymath.h"
 #include <string>
 
+struct FlightInfo {
+    float pitch;
+    float yaw;
+    float roll;
+    float altitude;
+    float speed;
+};
+
 class Plane
 {
 public:
@@ -29,6 +37,7 @@ public:
     void SetFlipped(bool flipped);
     bool GetFlipped();
 
+    FlightInfo GetFlightInfo();
     Model GetModel();
 
     // Movement methods
@@ -37,9 +46,6 @@ public:
 
     // LookAt method (if needed)
     void LookAt(const Vector3& targetPosition);
-
-    // Update the model's transform matrix
-    void UpdateTransform();
 
     // Update rotation based on pitch, yaw, roll
     void UpdateRotation();
@@ -58,13 +64,7 @@ private:
     bool isFlipped;
 
     // Movement variables
-    float pitch;
-    float yaw;
-    float roll;
-    float altitude;
-    float speed;
-
-
+    FlightInfo flightInfo;
 };
 
 #endif // PLANE_H

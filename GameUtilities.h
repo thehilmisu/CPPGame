@@ -2,6 +2,9 @@
 #define GAMEUTILITIES_H
 
 #include "raylib.h"
+#include <vector>
+#include "Enemy.h"
+#include "GameSettings.h"
 
 class GameUtilities{
 public:
@@ -31,6 +34,32 @@ public:
                 LIGHTGRAY
             );
         }
+    }
+    static void SpawnEnemy(const Vector3 playerPosition, std::vector<Enemy>& enemies)
+    {
+        if (enemies.size() >= ENEMY_MAX_COUNT)
+        {
+            // Don't spawn more than the maximum number of enemies
+            return;
+        }
+
+        // Random X and Y within specified ranges
+        float randomX = playerPosition.x + ((rand() % 1000 / 1000.0f) * ENEMY_SPAWN_RANGE_X * 2) - ENEMY_SPAWN_RANGE_X;
+        float randomY = playerPosition.y + ((rand() % 1000 / 1000.0f) * ENEMY_SPAWN_RANGE_Y * 2) - ENEMY_SPAWN_RANGE_Y;
+
+        // Z position ahead of the player
+        float spawnZ = playerPosition.z - ENEMY_SPAWN_DISTANCE;  // negative Z is forward
+
+        Vector3 spawnPosition = { randomX, randomY, spawnZ };
+        Vector3 enemySize = { ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE };
+
+        // Create a new enemy and add it to the list
+        enemies.emplace_back(spawnPosition, enemySize);
+    }
+    
+    static float CalculateDistance(const Vector3& a, const Vector3& b)
+    {
+        return Vector3Distance(a, b);
     }
 };
 
