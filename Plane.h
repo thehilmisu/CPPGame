@@ -18,13 +18,18 @@ public:
 
     // Position, Rotation, and Scale setters and getters
     void SetPosition(const Vector3& position);
-    Vector3 GetPosition() const;
+    Vector3 GetPosition();
 
     void SetRotation(const Quaternion& rotation);
     Quaternion GetRotation() const;
 
     void SetScale(const float& scale);
     float GetScale() const;
+
+    void SetFlipped(bool flipped);
+    bool GetFlipped();
+
+    Model GetModel();
 
     // Movement methods
     void Move(const Vector3& direction, float speed, float deltaTime);
@@ -39,14 +44,18 @@ public:
     // Update rotation based on pitch, yaw, roll
     void UpdateRotation();
 
+    // Handling the user input
     void HandleInput(float deltaTime);
+
+    void Unload();
 
 private:
     Model model;          // 3D model of the player
     Texture2D texture;    // Texture applied to the model
     Vector3 position;     // Player position in the world
     Quaternion rotation;  // Player rotation
-    float scale;        // Scale of the model
+    float scale;          // Scale of the model
+    bool isFlipped;
 
     // Movement variables
     float pitch;

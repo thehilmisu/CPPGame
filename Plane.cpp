@@ -3,7 +3,7 @@
 
 
 Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition)
-    : position(startPosition), rotation(QuaternionIdentity()), scale(1.0f),
+    : position(startPosition), rotation(QuaternionIdentity()), scale(1.0f), isFlipped(true),
       pitch(0.0f), yaw(0.0f), roll(0.0f), altitude(startPosition.y), speed(5.0f)
 {
     // Load the model
@@ -29,16 +29,52 @@ Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vecto
 
 Plane::~Plane()
 {
-    UnloadModel(model);
-    UnloadTexture(texture);
+    // UnloadModel(model);
+    // UnloadTexture(texture);
 }
 
-
-// Update method
-void Plane::Update(float deltaTime)
+void Plane::SetPosition(const Vector3& newPosition)
 {
-    // Additional updates if necessary
-    HandleInput(deltaTime);
+    position = newPosition;
+}
+
+Vector3 Plane::GetPosition()
+{
+    return position;
+}
+
+void Plane::SetRotation(const Quaternion& newRotation)
+{
+    rotation = newRotation;
+}
+
+Quaternion Plane::GetRotation() const
+{
+    return rotation;
+}
+
+void Plane::SetScale(const float& newScale)
+{
+    scale = newScale;
+}
+
+float Plane::GetScale() const
+{
+    return scale;
+}
+
+void Plane::SetFlipped(bool flipped)
+{
+    isFlipped = flipped;
+}
+
+bool Plane::GetFlipped()
+{
+    return isFlipped;
+}
+
+Model Plane::GetModel(){
+    return model;
 }
 
 void Plane::HandleInput(float deltaTime)
@@ -81,41 +117,18 @@ void Plane::HandleInput(float deltaTime)
     UpdateRotation();
 }
 
+// Update method
+void Plane::Update(float deltaTime)
+{
+    // Additional updates if necessary
+    HandleInput(deltaTime);
+}
+
 // Draw method
 void Plane::Draw()
 {
     // Draw the model with its transform
-    DrawModel(model, position, 1.0f, WHITE);
-}
-
-void Plane::SetPosition(const Vector3& newPosition)
-{
-    position = newPosition;
-}
-
-Vector3 Plane::GetPosition() const
-{
-    return position;
-}
-
-void Plane::SetRotation(const Quaternion& newRotation)
-{
-    rotation = newRotation;
-}
-
-Quaternion Plane::GetRotation() const
-{
-    return rotation;
-}
-
-void Plane::SetScale(const float& newScale)
-{
-    scale = newScale;
-}
-
-float Plane::GetScale() const
-{
-    return scale;
+    DrawModel(model, GetPosition(), 1.0f, WHITE);
 }
 
 void Plane::LookAt(const Vector3& targetPosition)
@@ -147,6 +160,7 @@ void Plane::Move(const Vector3& direction, float speed, float deltaTime)
 {
     Vector3 movement = Vector3Scale(direction, speed * deltaTime);
     position = Vector3Add(position, movement);
+
     UpdateTransform();
 }
 
@@ -183,12 +197,20 @@ void Plane::UpdateTransform()
     Matrix scaleMat = MatrixScale(scale, scale, scale);
     Matrix rotMat = QuaternionToMatrix(rotation);
 
-    // Apply an additional rotation to flip the model
-    Matrix adjustMat = MatrixRotateY(PI); // Rotate 180 degrees around Y-axis
-    rotMat = MatrixMultiply(adjustMat, rotMat);
+    if(isFlipped){
+        // Apply an additional rotation to flip the model
+        Matrix adjustMat = MatrixRotateY(PI); // Rotate 180 degrees around Y-axis
+        rotMat = MatrixMultiply(adjustMat, rotMat);
+    }
+
 
     Matrix transMat = MatrixTranslate(position.x, position.y, position.z);
 
     // Combine transformations: Translation * Rotation * Scale
     model.transform = MatrixMultiply(transMat, MatrixMultiply(rotMat, scaleMat));
+}
+
+void Plane::Unload() {
+    UnloadModel(model);
+    UnloadTexture(texture);
 }

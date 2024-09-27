@@ -1,35 +1,57 @@
 #include "raylib.h"
+#include <vector>
 #include "Plane.h"
+#include "Enemy.h"
+#include "GameSettings.h"
+#include "GameUtilities.h"
 
-#define     PLAYER_OBJ      "assets/plane.obj"
-#define     PLAYER_TEXTURE  "assets/plane_diffuse.png"
-#define     ENEMY_OBJ       ""
-#define     ENEMY_TEXTURE   ""
 
+void SpawnEnemy(const Vector3 playerPosition, std::vector<Enemy>& enemies)
+{
+    if (enemies.size() >= ENEMY_MAX_COUNT)
+    {
+        // Don't spawn more than the maximum number of enemies
+        return;
+    }
+
+    // Random X and Y within specified ranges
+    float randomX = playerPosition.x + ((rand() % 1000 / 1000.0f) * ENEMY_SPAWN_RANGE_X * 2) - ENEMY_SPAWN_RANGE_X;
+    float randomY = playerPosition.y + ((rand() % 1000 / 1000.0f) * ENEMY_SPAWN_RANGE_Y * 2) - ENEMY_SPAWN_RANGE_Y;
+
+    // Z position ahead of the player
+    float spawnZ = playerPosition.z - ENEMY_SPAWN_DISTANCE;  // Assuming negative Z is forward
+
+    Vector3 spawnPosition = { randomX, randomY, spawnZ };
+    Vector3 enemySize = { ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE };
+
+    // Create a new enemy and add it to the list
+    enemies.emplace_back(spawnPosition, enemySize);
+}
 
 int main()
 {
     // Initialization
-    const int screenWidth = 1080;
-    const int screenHeight = 720;
+    const int screenWidth = 1400;
+    const int screenHeight = 1000;
 
-    InitWindow(screenWidth, screenHeight, "3D Game with LookAt Function");
+    InitWindow(screenWidth, screenHeight, "Flight Mania");
     SetTargetFPS(60);
 
     // Create a player instance
     Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 0.0f, 0.0f });
-    player.SetScale(0.06f); 
+    player.SetScale(0.06f);
+    player.SetFlipped(true);
+
+    std::vector<Enemy> enemies;
+    float enemySpawnTimer = 0.0f;
 
     // Camera setup
     Camera3D camera = { 0 };
-    camera.position = (Vector3){ 0.0f, 5.0f, 10.0f };
+    camera.position = (Vector3){ 0.0f, 5.0f, -15.0f }; // Initial position
     camera.target = player.GetPosition();
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
-
-    // Cube (target) position
-    Vector3 cubePosition = { 5.0f, 0.0f, 0.0f };
 
     // Main game loop
     while (!WindowShouldClose())
@@ -37,20 +59,31 @@ int main()
         // Update
         float deltaTime = GetFrameTime();
 
-        // Move the cube with arrow keys
-        // float cubeSpeed = 5.0f * deltaTime;
-        // if (IsKeyDown(KEY_LEFT)) cubePosition.x -= cubeSpeed;
-        // if (IsKeyDown(KEY_RIGHT)) cubePosition.x += cubeSpeed;
-        // if (IsKeyDown(KEY_UP)) cubePosition.z -= cubeSpeed;
-        // if (IsKeyDown(KEY_DOWN)) cubePosition.z += cubeSpeed;
-        // if (IsKeyDown(KEY_W)) cubePosition.y += cubeSpeed;
-        // if (IsKeyDown(KEY_S)) cubePosition.y -= cubeSpeed;
-
-        // // Make the player look at the cube
-        // player.LookAt(cubePosition);
-
-        // Update the player (if any additional updates are needed)
+        // Update the player
         player.Update(deltaTime);
+
+        // Update the camera to follow the player without smoothing
+
+        Vector3 cameraOffset = { 0.0f, 5.0f, 15.0f };// Adjusted offset values
+        float smoothFactor = 15.0f * deltaTime / 5.0f; // Increase smooth factor
+        camera.position = Vector3Lerp(camera.position, Vector3Add(player.GetPosition(), cameraOffset), smoothFactor);
+        camera.target = player.GetPosition();
+
+
+        // Update enemy spawning
+        enemySpawnTimer += deltaTime;
+
+        if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
+        {
+            enemySpawnTimer = 0.0f;
+            SpawnEnemy(player.GetPosition(), enemies);
+        }
+
+        // Update enemies
+        for (auto& enemy : enemies)
+        {
+            enemy.Update(deltaTime, player.GetPosition());
+        }
 
         // Draw
         BeginDrawing();
@@ -60,24 +93,26 @@ int main()
 
                 // Draw the player
                 player.Draw();
+                //player.Move({0.0f,0.0f,-1.0f}, 5.0f, deltaTime);
 
-                // Draw the cube (target)
-                DrawCube(cubePosition, 1.0f, 1.0f, 1.0f, RED);
-                DrawCubeWires(cubePosition, 1.0f, 1.0f, 1.0f, MAROON);
+                for (auto& enemy : enemies)
+                {
+                    enemy.Draw();
+                }
 
                 // Draw grid
-                DrawGrid(100, 1.0f);
+                //DrawInfiniteGrid(1.0f, (Vector3){ player.GetPosition().x, 0.0f, player.GetPosition().z });
+                DrawGrid(50, 10);
 
             EndMode3D();
 
-            DrawText("Use arrow keys to move the cube (target).", 10, 10, 20, DARKGRAY);
-            DrawText("Player is looking at the cube.", 10, 35, 20, DARKGRAY);
-            DrawText("Use PAGE UP/DOWN to move cube vertically.", 10, 60, 20, DARKGRAY);
+            // Draw UI elements...
 
         EndDrawing();
     }
 
     // De-initialization
+    player.Unload();
     CloseWindow();
 
     return 0;
