@@ -38,7 +38,6 @@ Plane::~Plane()
 void Plane::Update(float deltaTime)
 {
     // Additional updates if necessary
-    HandleInput(deltaTime);
 }
 
 // Draw method
@@ -100,6 +99,20 @@ void Plane::LookAt(const Vector3& targetPosition)
     rotation = QuaternionFromEuler(0.0f, targetYawDegrees * DEG2RAD, 0.0f);
 
     // Update the transform matrix
+    UpdateTransform();
+}
+
+void Plane::Move(const Vector3& direction, float speed, float deltaTime)
+{
+    Vector3 movement = Vector3Scale(direction, speed * deltaTime);
+    position = Vector3Add(position, movement);
+    UpdateTransform();
+}
+
+void Plane::Rotate(const Vector3& axis, float angleDegrees)
+{
+    Quaternion q = QuaternionFromAxisAngle(axis, DEG2RAD * angleDegrees);
+    rotation = QuaternionNormalize(QuaternionMultiply(q, rotation));
     UpdateTransform();
 }
 

@@ -10,14 +10,11 @@ class Plane
 public:
     // Constructor and Destructor
     Plane(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition);
-    ~Plane();
+    virtual ~Plane();
 
     // Update and Draw methods
-    void Update(float deltaTime);
+    virtual void Update(float deltaTime);
     void Draw();
-
-    // Input handling
-    virtual void HandleInput(float deltaTime);
 
     // Position, Rotation, and Scale setters and getters
     void SetPosition(const Vector3& position);
@@ -30,8 +27,8 @@ public:
     Vector3 GetScale() const;
 
     // Movement methods
-    void Move(const Vector3& direction, float speed, float deltaTime);
-    void Rotate(const Vector3& axis, float angleDegrees);
+    virtual void Move(const Vector3& direction, float speed, float deltaTime);
+    virtual void Rotate(const Vector3& axis, float angleDegrees);
 
     // LookAt method (if needed)
     void LookAt(const Vector3& targetPosition);

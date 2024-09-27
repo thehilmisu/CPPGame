@@ -3,7 +3,7 @@ CXX := g++
 LINKER := $(CXX)
 
 # Name of the final executable
-TARGET := mygame
+TARGET := FlightMania
 
 # Directories
 SRCDIR := .

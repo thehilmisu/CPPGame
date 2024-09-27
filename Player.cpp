@@ -3,7 +3,7 @@
 
 
 Player::Player(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition)
-    : position(startPosition), rotation(QuaternionIdentity()), scale({1.0f, 1.0f, 1.0f}),
+    : Plane(modelPath, texturePath, startPosition),
       pitch(0.0f), yaw(0.0f), roll(0.0f), altitude(startPosition.y), speed(5.0f)
 {
     // Load the model
@@ -37,8 +37,8 @@ Player::~Player()
 void Player::HandleInput(float deltaTime)
 {
     // Adjust pitch (X-axis rotation)
-    if (IsKeyDown(KEY_DOWN)) { pitch += 60.0f * deltaTime; altitude -= speed * deltaTime; }
-    else if (IsKeyDown(KEY_UP)) { pitch -= 60.0f * deltaTime; altitude += speed * deltaTime; }
+    if (IsKeyDown(KEY_UP)) { pitch += 60.0f * deltaTime; altitude -= speed * deltaTime; }
+    else if (IsKeyDown(KEY_DOWN)) { pitch -= 60.0f * deltaTime; altitude += speed * deltaTime; }
     else
     {
         if (pitch > 3.0f) pitch -= 30.0f * deltaTime;
@@ -88,58 +88,17 @@ void Player::Draw()
     DrawModel(model, position, 1.0f, WHITE);
 }
 
-void Player::SetPosition(const Vector3& newPosition)
+void Player::Move(const Vector3& direction, float speed, float deltaTime)
 {
-    position = newPosition;
+    Vector3 movement = Vector3Scale(direction, speed * deltaTime);
+    position = Vector3Add(position, movement);
+    UpdateTransform();
 }
 
-Vector3 Player::GetPosition() const
+void Player::Rotate(const Vector3& axis, float angleDegrees)
 {
-    return position;
-}
-
-void Player::SetRotation(const Quaternion& newRotation)
-{
-    rotation = newRotation;
-}
-
-Quaternion Player::GetRotation() const
-{
-    return rotation;
-}
-
-void Player::SetScale(const Vector3& newScale)
-{
-    scale = newScale;
-}
-
-Vector3 Player::GetScale() const
-{
-    return scale;
-}
-
-void Player::LookAt(const Vector3& targetPosition)
-{
-    // Calculate the direction vector from the player to the target in the XZ plane
-    Vector3 direction = {
-        targetPosition.x - position.x,
-        0.0f, // Ignore Y-axis to prevent vertical rotation
-        targetPosition.z - position.z
-    };
-
-    // Normalize the direction vector
-    direction = Vector3Normalize(direction);
-
-    // Calculate the yaw angle (rotation around Y-axis)
-    float targetYaw = atan2f(direction.x, direction.z);
-
-    // Convert yaw from radians to degrees
-    float targetYawDegrees = RAD2DEG * targetYaw;
-
-    // Set the player's rotation around the Y-axis
-    rotation = QuaternionFromEuler(0.0f, targetYawDegrees * DEG2RAD, 0.0f);
-
-    // Update the transform matrix
+    Quaternion q = QuaternionFromAxisAngle(axis, DEG2RAD * angleDegrees);
+    rotation = QuaternionNormalize(QuaternionMultiply(q, rotation));
     UpdateTransform();
 }
 
