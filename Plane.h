@@ -10,11 +10,11 @@ class Plane
 public:
     // Constructor and Destructor
     Plane(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition);
-    virtual ~Plane();
+    ~Plane();
 
     // Update and Draw methods
     virtual void Update(float deltaTime);
-    void Draw();
+    virtual void Draw();
 
     // Position, Rotation, and Scale setters and getters
     void SetPosition(const Vector3& position);
@@ -23,22 +23,30 @@ public:
     void SetRotation(const Quaternion& rotation);
     Quaternion GetRotation() const;
 
-    void SetScale(const Vector3& scale);
-    Vector3 GetScale() const;
+    void SetScale(const float& scale);
+    float GetScale() const;
 
     // Movement methods
-    virtual void Move(const Vector3& direction, float speed, float deltaTime);
-    virtual void Rotate(const Vector3& axis, float angleDegrees);
+    void Move(const Vector3& direction, float speed, float deltaTime);
+    void Rotate(const Vector3& axis, float angleDegrees);
 
     // LookAt method (if needed)
     void LookAt(const Vector3& targetPosition);
+
+    // Update the model's transform matrix
+    void UpdateTransform();
+
+    // Update rotation based on pitch, yaw, roll
+    void UpdateRotation();
+
+    void HandleInput(float deltaTime);
 
 private:
     Model model;          // 3D model of the player
     Texture2D texture;    // Texture applied to the model
     Vector3 position;     // Player position in the world
     Quaternion rotation;  // Player rotation
-    Vector3 scale;        // Scale of the model
+    float scale;        // Scale of the model
 
     // Movement variables
     float pitch;
@@ -47,11 +55,7 @@ private:
     float altitude;
     float speed;
 
-    // Update the model's transform matrix
-    void UpdateTransform();
 
-    // Update rotation based on pitch, yaw, roll
-    void UpdateRotation();
 };
 
 #endif // PLANE_H

@@ -1,5 +1,10 @@
 #include "raylib.h"
-#include "Player.h"
+#include "Plane.h"
+
+#define     PLAYER_OBJ      "assets/plane.obj"
+#define     PLAYER_TEXTURE  "assets/plane_diffuse.png"
+#define     ENEMY_OBJ       ""
+#define     ENEMY_TEXTURE   ""
 
 
 int main()
@@ -12,15 +17,15 @@ int main()
     SetTargetFPS(60);
 
     // Create a player instance
-    Player player("assets/plane.obj", "assets/plane_diffuse.png", { 0.0f, 0.0f, 0.0f });
-    player.SetScale({ 0.06f, 0.06f, 0.06f }); // Adjust the scale if necessary
+    Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 0.0f, 0.0f });
+    player.SetScale(0.06f); 
 
     // Camera setup
     Camera3D camera = { 0 };
     camera.position = (Vector3){ 0.0f, 5.0f, 10.0f };
     camera.target = player.GetPosition();
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 45.0f;
+    camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
     // Cube (target) position

@@ -3,7 +3,7 @@
 
 
 Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition)
-    : position(startPosition), rotation(QuaternionIdentity()), scale({1.0f, 1.0f, 1.0f}),
+    : position(startPosition), rotation(QuaternionIdentity()), scale(1.0f),
       pitch(0.0f), yaw(0.0f), roll(0.0f), altitude(startPosition.y), speed(5.0f)
 {
     // Load the model
@@ -38,6 +38,47 @@ Plane::~Plane()
 void Plane::Update(float deltaTime)
 {
     // Additional updates if necessary
+    HandleInput(deltaTime);
+}
+
+void Plane::HandleInput(float deltaTime)
+{
+    // Adjust pitch (X-axis rotation)
+    if (IsKeyDown(KEY_DOWN)) { pitch += 60.0f * deltaTime; altitude -= speed * deltaTime; }
+    else if (IsKeyDown(KEY_UP)) { pitch -= 60.0f * deltaTime; altitude += speed * deltaTime; }
+    else
+    {
+        if (pitch > 3.0f) pitch -= 30.0f * deltaTime;
+        else if (pitch < -3.0f) pitch += 30.0f * deltaTime;
+    }
+
+    // Adjust yaw (Y-axis rotation)
+    if (IsKeyDown(KEY_A)) yaw += 60.0f * deltaTime;
+    else if (IsKeyDown(KEY_S)) yaw -= 60.0f * deltaTime;
+    else
+    {
+        if (yaw > 0.0f) yaw -= 50.0f * deltaTime;
+        else if (yaw < 0.0f) yaw += 50.0f * deltaTime;
+    }
+
+    // Adjust roll (Z-axis rotation) and horizontal movement
+    float turningValue = 0.0f;
+    if (IsKeyDown(KEY_RIGHT)) { roll -= 60.0f * deltaTime; turningValue += speed * deltaTime; }
+    else if (IsKeyDown(KEY_LEFT)) { roll += 60.0f * deltaTime; turningValue -= speed * deltaTime; }
+    else
+    {
+        if (roll > 6.0f * deltaTime) roll -= 60.0f * deltaTime;
+        else if (roll < -6.0f * deltaTime) roll += 60.0f * deltaTime;
+    }
+
+    // Update position based on turning value
+    position.x += turningValue;
+
+    // Update altitude
+    position.y = altitude;
+
+    // Update the player's rotation based on pitch, yaw, and roll
+    UpdateRotation();
 }
 
 // Draw method
@@ -67,12 +108,12 @@ Quaternion Plane::GetRotation() const
     return rotation;
 }
 
-void Plane::SetScale(const Vector3& newScale)
+void Plane::SetScale(const float& newScale)
 {
     scale = newScale;
 }
 
-Vector3 Plane::GetScale() const
+float Plane::GetScale() const
 {
     return scale;
 }
@@ -139,7 +180,7 @@ void Plane::UpdateRotation()
 
 void Plane::UpdateTransform()
 {
-    Matrix scaleMat = MatrixScale(scale.x, scale.y, scale.z);
+    Matrix scaleMat = MatrixScale(scale, scale, scale);
     Matrix rotMat = QuaternionToMatrix(rotation);
 
     // Apply an additional rotation to flip the model
