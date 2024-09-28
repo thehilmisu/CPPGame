@@ -54,9 +54,9 @@ public:
         Vector3 enemySize = { ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE };
 
         // Create a new enemy and add it to the list
-        enemies.emplace_back(spawnPosition, enemySize);
+        enemies.emplace_back(ENEMY_MODEL,ENEMY_TEXTURE,spawnPosition, enemySize);
     }
-    
+
     static float CalculateDistance(const Vector3& a, const Vector3& b)
     {
         return Vector3Distance(a, b);

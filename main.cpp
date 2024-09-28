@@ -14,6 +14,7 @@ int main()
 
     InitWindow(screenWidth, screenHeight, "Flight Mania");
     SetTargetFPS(60);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
 
     // Create a player instance
     Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 0.0f, 0.0f });
@@ -34,6 +35,11 @@ int main()
     Terrain terrain;
     terrain.Initialize();
 
+    Model m = LoadModel("assets/house.obj");
+    Texture t = LoadTexture("assets/house_diffuse.png");
+    m.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+
     // Main game loop
     while (!WindowShouldClose())
     {
@@ -42,7 +48,7 @@ int main()
 
       
         // Move the player forward first
-        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+        //player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
 
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
@@ -74,12 +80,14 @@ int main()
 
         // Draw
         BeginDrawing();
-            ClearBackground(BLACK);
+            ClearBackground(SKYBLUE);
 
             BeginMode3D(camera);
 
                 // Draw Terrain
                 terrain.Draw();
+
+                DrawModel(m,{0.0f,0.0f, -25.0f},1.0f,WHITE);
 
                 // Draw the player
                 player.Draw();
@@ -115,6 +123,8 @@ int main()
 
             sprintf(buffer, "Camera: %f, %f, %f", camera.position.x,camera.position.y,camera.position.z);
             DrawText(buffer, 10, 190, 15, WHITE);
+
+            DrawFPS(10, 220);
 
 
         EndDrawing();

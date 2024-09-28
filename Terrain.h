@@ -5,17 +5,16 @@
 
 #include "raylib.h"
 #include <map>
-#include <utility>  // For std::pair
+#include <utility>
 #include <vector>
 
 // Define the chunk size and view distance
-#define CHUNK_SIZE 256.0f
-#define CHUNK_RESOLUTION 128    // Number of vertices per side
-#define VIEW_DISTANCE 2         // Number of chunks to load around the player
+#define CHUNK_SIZE 512.0f
+#define CHUNK_RESOLUTION 64    // Number of vertices per side
+#define VIEW_DISTANCE 4         // Number of chunks to load around the player
 
 // Define the height scale
-#define HEIGHT_SCALE 2.0f
-
+#define HEIGHT_SCALE 1.0f
 
 class Terrain
 {
@@ -49,8 +48,8 @@ private:
     // Map to store loaded terrain chunks
     std::map<std::pair<int, int>, TerrainChunk> terrainChunks;
 
-    // Texture for the terrain
-    Texture2D terrainTexture;
+    // Texture atlas for terrain
+    Texture2D terrainAtlas;
 
     // Generate a terrain chunk model at the given index
     Model GenerateTerrainChunkModel(int chunkX, int chunkZ);

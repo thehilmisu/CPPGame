@@ -1,9 +1,28 @@
 #include "Enemy.h"
+#include <iostream>
 
-Enemy::Enemy(Vector3 startPosition, Vector3 size)
+
+Enemy::Enemy(const std::string& modelPath, const std::string& texturePath,Vector3 startPosition, Vector3 size)
     : position(startPosition), size(size), active(true)
 {
-    color = RED;
+
+     // Load the model
+    model = LoadModel(modelPath.c_str());
+    if (model.meshCount == 0)
+    {
+        std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
+    }
+
+    // Load the texture
+    texture = LoadTexture(texturePath.c_str());
+    if (texture.id == 0)
+    {
+        std::cerr << "Error: Failed to load texture from " << texturePath << std::endl;
+    }
+
+    // Apply the texture to the model
+    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+
 }
 
 Enemy::~Enemy()
@@ -21,7 +40,7 @@ void Enemy::Draw()
 {
     if (active)
     {
-        DrawCube(position, size.x, size.y, size.z, color);
+        DrawModel(model, position, 1.0f, WHITE);
     }
 }
 

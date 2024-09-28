@@ -15,7 +15,8 @@
 #define     CAMERA_POSITION
 
 
-
+#define ENEMY_MODEL         "assets/cube.obj"
+#define ENEMY_TEXTURE       "assets/cube_diffuse.png"
 #define ENEMY_SPAWN_DISTANCE 50.0f
 #define ENEMY_SPAWN_INTERVAL 2.0f
 #define ENEMY_MAX_COUNT 20
