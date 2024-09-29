@@ -3,6 +3,8 @@
 
 #include "raylib.h"
 
+#define     WINDOW_NAME     "Flight Mania"
+
 #define     PLAYER_OBJ      "assets/plane.obj"
 #define     PLAYER_TEXTURE  "assets/plane_diffuse.png"
 #define     MIN_ROLL_PITCH_VALUE    -50.0f

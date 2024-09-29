@@ -10,11 +10,11 @@
 
 // Define the chunk size and view distance
 #define CHUNK_SIZE 512.0f
-#define CHUNK_RESOLUTION 64    // Number of vertices per side
+#define CHUNK_RESOLUTION 128    // Number of vertices per side
 #define VIEW_DISTANCE 4         // Number of chunks to load around the player
 
 // Define the height scale
-#define HEIGHT_SCALE 1.0f
+#define HEIGHT_SCALE 0.0f
 
 class Terrain
 {

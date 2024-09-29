@@ -33,7 +33,7 @@ Terrain::~Terrain()
 void Terrain::Initialize()
 {
     // Load terrain texture atlas
-    terrainAtlas = LoadTexture("assets/plain.png");
+    terrainAtlas = LoadTexture("assets/grass.png");
 
     // Check if texture loaded successfully
     if (terrainAtlas.id == 0)
@@ -65,7 +65,6 @@ void Terrain::Update(Vector3 playerPosition)
                 chunk.model = GenerateTerrainChunkModel(x, z);
                 chunk.isLoaded = true;
                 terrainChunks[chunkKey] = chunk;
-                std::cout << "Loaded terrain chunk (" << x << ", " << z << ")\n";
             }
         }
     }
@@ -81,7 +80,6 @@ void Terrain::Update(Vector3 playerPosition)
         if (distanceX > VIEW_DISTANCE || distanceZ > VIEW_DISTANCE)
         {
             // Unload chunk
-            std::cout << "Unloading terrain chunk (" << chunkX << ", " << chunkZ << ")\n";
             UnloadModel(it->second.model);
             it = terrainChunks.erase(it);
         }
@@ -119,25 +117,17 @@ void Terrain::Unload()
 
     // Unload terrain texture atlas
     UnloadTexture(terrainAtlas);
-
-    std::cout << "Terrain resources unloaded.\n";
 }
 
 Model Terrain::GenerateTerrainChunkModel(int chunkX, int chunkZ)
 {
-    std::cout << "Generating terrain chunk (" << chunkX << ", " << chunkZ << ")\n";
 
     // Generate heightmap image using Perlin noise
     int resolution = CHUNK_RESOLUTION;
     Image heightmap = GenImagePerlinNoise(resolution, resolution,
                                          chunkX * CHUNK_SIZE, chunkZ * CHUNK_SIZE,
-                                         20.0f);  // Adjust scale for detail
-
-    if (heightmap.data == nullptr)
-    {
-        std::cerr << "Failed to generate heightmap for chunk (" << chunkX << ", " << chunkZ << ")\n";
-    }
-
+                                         200.0f);  // Adjust scale for detail
+                                         
     // Generate mesh from heightmap
     Mesh mesh = GenMeshHeightmap(heightmap, (Vector3){ CHUNK_SIZE, HEIGHT_SCALE, CHUNK_SIZE });
     UnloadImage(heightmap);  // Unload image after generating mesh

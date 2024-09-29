@@ -4,6 +4,7 @@
 #include "Enemy.h"
 #include "GameUtilities.h"
 #include "Terrain.h"
+#include "SimpleTerrain.h"
 
 
 int main()
@@ -12,7 +13,7 @@ int main()
     const int screenWidth = 1400;
     const int screenHeight = 1000;
 
-    InitWindow(screenWidth, screenHeight, "Flight Mania");
+    InitWindow(screenWidth, screenHeight, WINDOW_NAME);
     SetTargetFPS(60);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
@@ -32,12 +33,28 @@ int main()
     camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    Terrain terrain;
-    terrain.Initialize();
+    // Terrain terrain;
+    // terrain.Initialize();
+
+    SimpleTerrain simpleTerrain;
 
     Model m = LoadModel("assets/house.obj");
     Texture t = LoadTexture("assets/house_diffuse.png");
     m.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
+
+    // Model c = LoadModel("assets/castle.obj");
+    // Texture ct = LoadTexture("assets/cottage_diffuse.png");
+    // c.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = ct;
+
+
+    // Model b = LoadModel("assets/bridge.obj");
+    // Texture bt = LoadTexture("assets/bridge_diffuse.png");
+    // b.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = bt;
+
+
+    // Model mb = LoadModel("assets/market.obj");
+    // Texture mbt = LoadTexture("assets/market_diffuse.png");
+    // mb.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = mbt;
 
 
     // Main game loop
@@ -54,7 +71,8 @@ int main()
         player.Update(deltaTime);
 
         //update the terrain
-        terrain.Update(player.GetPosition());
+        //terrain.Update(player.GetPosition());
+        simpleTerrain.Update(deltaTime, player.GetPosition());
 
         // Update the camera to follow the player without smoothing
         Vector3 cameraOffset = { 0.0f, -5.0f, -15.0f };// Adjusted offset values
@@ -85,9 +103,14 @@ int main()
             BeginMode3D(camera);
 
                 // Draw Terrain
-                terrain.Draw();
+                //terrain.Draw();
+                DrawModel(simpleTerrain.GetModel(), (Vector3){ -8.0f, 0.0f, -8.0f }, 1.0f, WHITE);
 
-                DrawModel(m,{0.0f,0.0f, -25.0f},1.0f,WHITE);
+                // DrawModel(m,{0.0f,1.0f, -25.0f},1.0f,WHITE);
+                // DrawModel(c, {50.0f,1.0f, -55.0f},1.0f,WHITE);
+                // DrawModel(b, {0.0f,1.0f, -55.0f},1.0f,WHITE);
+                // DrawModel(mb, {20.0f,1.0f, -55.0f},1.0f,WHITE);
+
 
                 // Draw the player
                 player.Draw();
@@ -98,7 +121,7 @@ int main()
                 }
 
                 // Draw grid
-                DrawGrid(50, 10);
+                //DrawGrid(50, 10);
 
             EndMode3D();
 
@@ -132,7 +155,8 @@ int main()
 
     // De-initialization
     player.Unload();
-    terrain.Unload();
+    //terrain.Unload();
+    simpleTerrain.Unload();
     CloseWindow();
 
     return 0;
