@@ -3,7 +3,6 @@
 #include "Plane.h"
 #include "Enemy.h"
 #include "GameUtilities.h"
-#include "Terrain.h"
 #include "SimpleTerrain.h"
 
 
@@ -22,8 +21,7 @@ int main()
     player.SetScale(0.06f);
     player.SetFlipped(true);
 
-    std::vector<Enemy> enemies;
-    float enemySpawnTimer = 0.0f;
+    //Enemy enemy(ENEMY_OBJ, ENEMY_TEXTURE,{ 0.0f, 0.0f, 0.0f }, 2.0f);
 
     // Camera setup
     Camera3D camera = { 0 };
@@ -33,29 +31,8 @@ int main()
     camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    // Terrain terrain;
-    // terrain.Initialize();
-
     SimpleTerrain simpleTerrain;
-
-    Model m = LoadModel("assets/house.obj");
-    Texture t = LoadTexture("assets/house_diffuse.png");
-    m.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = t;
-
-    // Model c = LoadModel("assets/castle.obj");
-    // Texture ct = LoadTexture("assets/cottage_diffuse.png");
-    // c.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = ct;
-
-
-    // Model b = LoadModel("assets/bridge.obj");
-    // Texture bt = LoadTexture("assets/bridge_diffuse.png");
-    // b.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = bt;
-
-
-    // Model mb = LoadModel("assets/market.obj");
-    // Texture mbt = LoadTexture("assets/market_diffuse.png");
-    // mb.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = mbt;
-
+    simpleTerrain.LoadChunks(player.GetPosition());
 
     // Main game loop
     while (!WindowShouldClose())
@@ -65,14 +42,13 @@ int main()
 
       
         // Move the player forward first
-        //player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
 
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
 
         //update the terrain
-        //terrain.Update(player.GetPosition());
-        simpleTerrain.Update(deltaTime, player.GetPosition());
+        simpleTerrain.Update(player.GetPosition());
 
         // Update the camera to follow the player without smoothing
         Vector3 cameraOffset = { 0.0f, -5.0f, -15.0f };// Adjusted offset values
@@ -81,20 +57,8 @@ int main()
         camera.position = Vector3Subtract(player.GetPosition(), cameraOffset);
         camera.target = player.GetPosition();
 
-        // Update enemy spawning
-        enemySpawnTimer += deltaTime;
-
-        if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
-        {
-            enemySpawnTimer = 0.0f;
-            GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
-        }
-
         // Update enemies
-        for (auto& enemy : enemies)
-        {
-            enemy.Update(deltaTime, player.GetPosition());
-        }
+        //enemy.Update(deltaTime, player.GetPosition());
 
         // Draw
         BeginDrawing();
@@ -103,25 +67,11 @@ int main()
             BeginMode3D(camera);
 
                 // Draw Terrain
-                //terrain.Draw();
-                DrawModel(simpleTerrain.GetModel(), (Vector3){ -8.0f, 0.0f, -8.0f }, 1.0f, WHITE);
-
-                // DrawModel(m,{0.0f,1.0f, -25.0f},1.0f,WHITE);
-                // DrawModel(c, {50.0f,1.0f, -55.0f},1.0f,WHITE);
-                // DrawModel(b, {0.0f,1.0f, -55.0f},1.0f,WHITE);
-                // DrawModel(mb, {20.0f,1.0f, -55.0f},1.0f,WHITE);
-
+                simpleTerrain.Draw();
 
                 // Draw the player
                 player.Draw();
-
-                for (auto& enemy : enemies)
-                {
-                    enemy.Draw();
-                }
-
-                // Draw grid
-                //DrawGrid(50, 10);
+                //enemy.Draw();
 
             EndMode3D();
 
@@ -155,8 +105,8 @@ int main()
 
     // De-initialization
     player.Unload();
-    //terrain.Unload();
     simpleTerrain.Unload();
+    //enemy.Unload();
     CloseWindow();
 
     return 0;

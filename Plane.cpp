@@ -22,6 +22,7 @@ Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vecto
 
     // Apply the texture to the model
     model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+   
 
     // Initialize the transform
     UpdateRotation();

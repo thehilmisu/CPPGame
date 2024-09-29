@@ -4,7 +4,20 @@
 #define SIMPLETERRAIN_H
 
 #include "raylib.h"
+#include <vector>
 
+
+#define S_CHUNK_SIZE 16     // Size of each chunk in units
+#define S_VIEW_DISTANCE 6   // Number of chunks to load around the player
+
+
+struct TerrainChunk {
+    Mesh mesh;
+    Model model;
+    Texture2D texture;
+    Vector3 position;
+    bool active;
+};
 
 class SimpleTerrain {
 
@@ -17,8 +30,11 @@ public:
 
     void SetHeightmap(Vector3 hMap);
 
-    void Update(float deltaTime, Vector3 playerPosition);
+    void Update(Vector3 playerPosition);
+    void Draw();
     void Unload();
+
+    void LoadChunks(Vector3 playerPosition);
 
 private:
     Model terrainModel;
@@ -26,6 +42,11 @@ private:
     Image heightMap;
     Mesh terrainMesh;
     Vector3 heightMeshMap;
+    std::vector<TerrainChunk> terrainChunks;
+
+    TerrainChunk GenerateChunk(Vector3 chunkPosition);
+    
+
 
 };
 

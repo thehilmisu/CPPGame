@@ -5,6 +5,7 @@
 
 #include "raylib.h"
 #include "raymath.h"
+#include <vector>
 
 class Enemy
 {
@@ -18,6 +19,7 @@ public:
     Vector3 GetPosition() const;
     bool IsActive() const;
     void Deactivate();
+    void Unload();
 
 private:
     Model model;          // 3D model
@@ -25,6 +27,8 @@ private:
     Vector3 position;
     Vector3 size;
     bool active;
+    float enemySpawnTimer = 0.0f;
+    std::vector<Enemy> enemies;
 };
 
 #endif // ENEMY_H

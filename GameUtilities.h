@@ -54,13 +54,23 @@ public:
         Vector3 enemySize = { ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE };
 
         // Create a new enemy and add it to the list
-        enemies.emplace_back(ENEMY_MODEL,ENEMY_TEXTURE,spawnPosition, enemySize);
+        enemies.emplace_back(ENEMY_OBJ,ENEMY_TEXTURE,spawnPosition, enemySize);
     }
 
     static float CalculateDistance(const Vector3& a, const Vector3& b)
     {
         return Vector3Distance(a, b);
     }
+
+    static float PerlinNoise(float x, float z) {
+        // Simple noise function (replace with a more complex algorithm if needed)
+        return sinf(x * 0.1f) * cosf(z * 0.1f);
+    }
+
+    static float fractalNoise(float x, float z) {
+        return PerlinNoise(x, z) * 10.0f + PerlinNoise(x * 2, z * 2) * 5.0f + PerlinNoise(x * 4, z * 4) * 2.5f;
+    }
+
 };
 
 #endif
