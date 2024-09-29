@@ -37,33 +37,19 @@ void Enemy::Unload()
     UnloadModel(model);
     UnloadTexture(texture);
 
-    enemies.clear();
 }
 
 void Enemy::Update(float deltaTime, Vector3 targetPosition)
 {
    float smoothFactor = 2.0f * deltaTime;
    position = Vector3MoveTowards(position, Vector3Lerp(position, targetPosition, smoothFactor), 2);
-
-   // Update enemy spawning
-    enemySpawnTimer += deltaTime;
-
-    if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
-    {
-        enemySpawnTimer = 0.0f;
-        GameUtilities::SpawnEnemy(targetPosition, enemies);
-    }
-
 }
 
 void Enemy::Draw()
 {
-    for(auto& i : enemies)
+    if(active)
     {
-        if (i.active)
-        {
-            DrawModel(i.model, i.position, 1.0f, WHITE);
-        }
+        DrawModel(model, position, 1.0f, WHITE);
     }
 }
 

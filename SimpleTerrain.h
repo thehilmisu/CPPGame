@@ -25,9 +25,6 @@ public:
     SimpleTerrain();
     ~SimpleTerrain();
 
-    void SetModel(Model model);
-    Model GetModel();
-
     void SetHeightmap(Vector3 hMap);
 
     void Update(Vector3 playerPosition);

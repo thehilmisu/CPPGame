@@ -63,7 +63,7 @@ void SimpleTerrain::LoadChunks(Vector3 playerPosition)
     //load chunks
     for (int z = -S_VIEW_DISTANCE; z <= S_VIEW_DISTANCE; z++) {
         for (int x = -S_VIEW_DISTANCE; x <= S_VIEW_DISTANCE; x++) {
-            Vector3 chunkPos = {(playerChunkX + x) * S_CHUNK_SIZE, 0.0f, (playerChunkZ + z) * S_CHUNK_SIZE};
+            Vector3 chunkPos = {(float)(playerChunkX + x) * S_CHUNK_SIZE, 0.0f, (float)(playerChunkZ + z) * S_CHUNK_SIZE};
             TerrainChunk chunk = GenerateChunk(chunkPos);
             terrainChunks.push_back(chunk);
         }
@@ -99,19 +99,9 @@ void SimpleTerrain::SetHeightmap(Vector3 hMap)
     heightMeshMap = hMap;
 }
 
-void SimpleTerrain::SetModel(Model model)
-{
-    terrainModel = model;
-}
-
-Model SimpleTerrain::GetModel()
-{
-    return terrainModel;
-}
-
 void SimpleTerrain::Unload()
 {
-    UnloadModel(terrainModel);
+    //UnloadModel(terrainModel);
 
     for(auto& chunk : terrainChunks){
         UnloadModel(chunk.model);

@@ -27,8 +27,6 @@ private:
     Vector3 position;
     Vector3 size;
     bool active;
-    float enemySpawnTimer = 0.0f;
-    std::vector<Enemy> enemies;
 };
 
 #endif // ENEMY_H

@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <vector>
+#include <memory>
 #include "Plane.h"
 #include "Enemy.h"
 #include "GameUtilities.h"
@@ -9,23 +10,24 @@
 int main()
 {
     // Initialization
-    const int screenWidth = 1400;
-    const int screenHeight = 1000;
+    const int screenWidth = 1080;
+    const int screenHeight = 720;
 
     InitWindow(screenWidth, screenHeight, WINDOW_NAME);
     SetTargetFPS(60);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
     // Create a player instance
-    Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 0.0f, 0.0f });
+    Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 20.0f, 0.0f });
     player.SetScale(0.06f);
     player.SetFlipped(true);
 
-    //Enemy enemy(ENEMY_OBJ, ENEMY_TEXTURE,{ 0.0f, 0.0f, 0.0f }, 2.0f);
+    float enemySpawnTimer = 0.0f;
+    std::vector<Enemy> enemies;
 
     // Camera setup
     Camera3D camera = { 0 };
-    camera.position = (Vector3){ 0.0f, 5.0f, -15.0f }; // Initial position
+    camera.position = (Vector3){ 0.0f, 25.0f, -15.0f }; // Initial position
     camera.target = player.GetPosition();
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     camera.fovy = 65.0f;
@@ -39,7 +41,6 @@ int main()
     {
         // Update
         float deltaTime = GetFrameTime();
-
       
         // Move the player forward first
         player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
@@ -57,8 +58,14 @@ int main()
         camera.position = Vector3Subtract(player.GetPosition(), cameraOffset);
         camera.target = player.GetPosition();
 
-        // Update enemies
-        //enemy.Update(deltaTime, player.GetPosition());
+         // Update enemy spawning
+        enemySpawnTimer += deltaTime;
+
+        if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
+        {
+            enemySpawnTimer = 0.0f;
+            GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
+        }
 
         // Draw
         BeginDrawing();
@@ -71,7 +78,13 @@ int main()
 
                 // Draw the player
                 player.Draw();
-                //enemy.Draw();
+                
+                //Draw enemies
+                for(auto& enemy : enemies)
+                {
+                    enemy.Update(deltaTime, player.GetPosition());
+                    enemy.Draw();
+                }
 
             EndMode3D();
 
@@ -106,7 +119,9 @@ int main()
     // De-initialization
     player.Unload();
     simpleTerrain.Unload();
-    //enemy.Unload();
+    for(auto& i : enemies)
+        i.Unload();
+    enemies.clear();
     CloseWindow();
 
     return 0;
