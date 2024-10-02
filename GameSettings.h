@@ -7,8 +7,9 @@
 
 #define     PLAYER_OBJ              "assets/plane.obj"
 #define     PLAYER_TEXTURE          "assets/plane_diffuse.png"
-#define     MIN_ROLL_PITCH_VALUE    -50.0f
-#define     MAX_ROLL_PITCH_VALUE    +50.0f
+#define     PLAYER_RAFALE_OBJ       "assets/Rafale/Rafale.obj"
+#define     MIN_ROLL_PITCH_VALUE    -35.0f
+#define     MAX_ROLL_PITCH_VALUE    +35.0f
 #define     ROLL_PITCH_CONSTANT      60.0f
 
 

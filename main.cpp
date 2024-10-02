@@ -5,7 +5,7 @@
 #include "Enemy.h"
 #include "GameUtilities.h"
 #include "SimpleTerrain.h"
-#include "Cloud.h"
+#include "CloudManager.h"
 
 
 int main()
@@ -19,16 +19,13 @@ int main()
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
     // Create a player instance
-    //Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 20.0f, 0.0f });
-    Plane player("assets/jet/11805_airplane_v2_L2.obj","assets/jet/11805_airplane_v2_L2.mtl",{ 0.0f, 20.0f, 0.0f });
-    //Plane player("assets/B2/B-2_high.obj","assets/B2/B-2_high.mtl",{ 0.0f, 20.0f, 0.0f });
-    player.SetScale(0.005f);
-    //player.SetFlipped(true);
+    Plane player(PLAYER_RAFALE_OBJ,"",{ 0.0f, 20.0f, 0.0f });
+    player.SetScale(0.4f);
+    player.SetFlipped(true);
 
     float enemySpawnTimer = 0.0f;
     std::vector<Enemy> enemies;
 
-    Cloud cloud("assets/Clouds/Cloud_Polygon_Blender_1.obj","cloud_diffuse.png",{0.0f, 20.0f, -20.0f},{10.0f,1.0f,1.0f});
 
     // Camera setup
     Camera3D camera = { 0 };
@@ -48,7 +45,7 @@ int main()
         float deltaTime = GetFrameTime();
       
         // Move the player forward first
-        //player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
 
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
@@ -57,9 +54,7 @@ int main()
         simpleTerrain.Update(player.GetPosition());
 
         // Update the camera to follow the player without smoothing
-        Vector3 cameraOffset = { 0.0f, -5.0f, -15.0f };// Adjusted offset values
-        float smoothFactor = 15.0f * deltaTime; // Increase smooth factor
-        //camera.position = Vector3Lerp(Vector3Subtract(player.GetPosition(), cameraOffset), player.GetPosition(), smoothFactor);
+        Vector3 cameraOffset = { 0.0f, -5.0f, -15.0f };
         camera.position = Vector3Subtract(player.GetPosition(), cameraOffset);
         camera.target = player.GetPosition();
 
@@ -69,7 +64,7 @@ int main()
         if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
         {
             enemySpawnTimer = 0.0f;
-            //GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
+            GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
         }
 
         // Draw
@@ -91,7 +86,6 @@ int main()
                     enemy.Draw();
                 }
 
-                cloud.Draw();
 
             EndMode3D();
 

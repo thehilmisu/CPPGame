@@ -68,23 +68,24 @@ FlightInfo Plane::GetFlightInfo()
 void Plane::HandleInput(float deltaTime)
 {
     // Adjust pitch (X-axis rotation)
-    if (IsKeyDown(KEY_UP)) { 
-        flightInfo.pitch -= ROLL_PITCH_CONSTANT * deltaTime; 
+    if (IsKeyDown(KEY_UP)) {
+        flightInfo.pitch -= ROLL_PITCH_CONSTANT * deltaTime;
         if(flightInfo.pitch <= MIN_ROLL_PITCH_VALUE)
             flightInfo.pitch = MIN_ROLL_PITCH_VALUE;
-        flightInfo.altitude += flightInfo.speed * deltaTime; 
+        flightInfo.altitude += flightInfo.speed * deltaTime;
     }
-    else if (IsKeyDown(KEY_DOWN)) { 
-        flightInfo.pitch += ROLL_PITCH_CONSTANT * deltaTime; 
+    else if (IsKeyDown(KEY_DOWN)) {
+        flightInfo.pitch += ROLL_PITCH_CONSTANT * deltaTime;
         if(flightInfo.pitch >= MAX_ROLL_PITCH_VALUE)
             flightInfo.pitch = MAX_ROLL_PITCH_VALUE;
-        flightInfo.altitude -= flightInfo.speed * deltaTime; 
+        flightInfo.altitude -= flightInfo.speed * deltaTime;
     }
     else
     {
         if (flightInfo.pitch > 3.0f) flightInfo.pitch -= ROLL_PITCH_CONSTANT * deltaTime;
         else if (flightInfo.pitch < -3.0f) flightInfo.pitch += ROLL_PITCH_CONSTANT * deltaTime;
     }
+
 
     // Adjust roll (Z-axis rotation) and horizontal movement
     float turningValue = 0.0f;
@@ -137,17 +138,9 @@ void Plane::UpdateRotation()
     // Combine rotations: roll * pitch * yaw
     Matrix rotationMat = MatrixMultiply(rollMat, MatrixMultiply(pitchMat, yawMat));
 
-    // Apply flipping if necessary
-    if (isFlipped)
-    {
+    if(isFlipped) {
         Matrix flipMat = MatrixRotateY(PI); // Rotate 180 degrees around Y-axis
-        //rotationMat = MatrixMultiply(rotationMat, flipMat);
-
-        Matrix flipX = MatrixRotateX(30);
-        rotationMat = MatrixMultiply(rotationMat, flipX);
-
-        Matrix flipZ = MatrixRotateZ(-PI/2);
-        //rotationMat = MatrixMultiply(rotationMat, flipZ);
+        rotationMat = MatrixMultiply(rotationMat, flipMat);
     }
 
     // Create scaling matrix
