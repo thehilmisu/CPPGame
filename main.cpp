@@ -20,9 +20,10 @@ int main()
 
     // Create a player instance
     //Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 20.0f, 0.0f });
-    Plane player("assets/TAL16OBJ/TAL16OBJ.obj","assets/TAL16OBJ/TALTS.png",{ 0.0f, 20.0f, 0.0f });
-    player.SetScale(0.6f);
-    player.SetFlipped(true);
+    Plane player("assets/jet/11805_airplane_v2_L2.obj","assets/jet/11805_airplane_v2_L2.mtl",{ 0.0f, 20.0f, 0.0f });
+    //Plane player("assets/B2/B-2_high.obj","assets/B2/B-2_high.mtl",{ 0.0f, 20.0f, 0.0f });
+    player.SetScale(0.005f);
+    //player.SetFlipped(true);
 
     float enemySpawnTimer = 0.0f;
     std::vector<Enemy> enemies;
@@ -47,7 +48,7 @@ int main()
         float deltaTime = GetFrameTime();
       
         // Move the player forward first
-        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+        //player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
 
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
@@ -68,7 +69,7 @@ int main()
         if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
         {
             enemySpawnTimer = 0.0f;
-            GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
+            //GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
         }
 
         // Draw

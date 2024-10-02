@@ -16,14 +16,14 @@ Cloud::Cloud(const std::string& modelPath, const std::string& texturePath,Vector
     }
 
     // Load the texture
-    texture = LoadTexture(texturePath.c_str());
-    if (texture.id == 0)
-    {
-        std::cerr << "Error: Failed to load texture from " << texturePath << std::endl;
-    }
-
-    // Apply the texture to the model
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+//    texture = LoadTexture(texturePath.c_str());
+//    if (texture.id == 0)
+//    {
+//        std::cerr << "Error: Failed to load texture from " << texturePath << std::endl;
+//    }
+//
+//    // Apply the texture to the model
+//    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
 
 }
 

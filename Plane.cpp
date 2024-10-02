@@ -14,14 +14,14 @@ Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vecto
     }
 
     // Load the texture
-    texture = LoadTexture(texturePath.c_str());
-    if (texture.id == 0)
-    {
-        std::cerr << "Error: Failed to load texture from " << texturePath << std::endl;
-    }
-
-    // Apply the texture to the model
-    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    // texture = LoadTexture(texturePath.c_str());
+    // if (texture.id == 0)
+    // {
+    //     std::cerr << "Error: Failed to load texture from " << texturePath << std::endl;
+    // }
+    //
+    // // Apply the texture to the model
+    // model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
    
 
     // Initialize the transform
@@ -141,7 +141,13 @@ void Plane::UpdateRotation()
     if (isFlipped)
     {
         Matrix flipMat = MatrixRotateY(PI); // Rotate 180 degrees around Y-axis
-        rotationMat = MatrixMultiply(rotationMat, flipMat);
+        //rotationMat = MatrixMultiply(rotationMat, flipMat);
+
+        Matrix flipX = MatrixRotateX(30);
+        rotationMat = MatrixMultiply(rotationMat, flipX);
+
+        Matrix flipZ = MatrixRotateZ(-PI/2);
+        //rotationMat = MatrixMultiply(rotationMat, flipZ);
     }
 
     // Create scaling matrix

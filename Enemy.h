@@ -11,9 +11,9 @@ class Enemy
 {
 public:
     Enemy(const std::string& modelPath, const std::string& texturePath,Vector3 startPosition, Vector3 size);
-    ~Enemy();
+    ~Enemy() = default;
 
-    void Update(float deltaTime, Vector3 targetPosition);
+    void Update(float deltaTime, const Vector3 targetPosition);
     void Draw();
 
     Vector3 GetPosition() const;
