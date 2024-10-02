@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "GameUtilities.h"
 #include "SimpleTerrain.h"
+#include "Cloud.h"
 
 
 int main()
@@ -18,12 +19,15 @@ int main()
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
     // Create a player instance
-    Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 20.0f, 0.0f });
-    player.SetScale(0.06f);
+    //Plane player(PLAYER_OBJ, PLAYER_TEXTURE, { 0.0f, 20.0f, 0.0f });
+    Plane player("assets/TAL16OBJ/TAL16OBJ.obj","assets/TAL16OBJ/TALTS.png",{ 0.0f, 20.0f, 0.0f });
+    player.SetScale(0.6f);
     player.SetFlipped(true);
 
     float enemySpawnTimer = 0.0f;
     std::vector<Enemy> enemies;
+
+    Cloud cloud("assets/Clouds/Cloud_Polygon_Blender_1.obj","cloud_diffuse.png",{0.0f, 20.0f, -20.0f},{10.0f,1.0f,1.0f});
 
     // Camera setup
     Camera3D camera = { 0 };
@@ -85,6 +89,8 @@ int main()
                     enemy.Update(deltaTime, player.GetPosition());
                     enemy.Draw();
                 }
+
+                cloud.Draw();
 
             EndMode3D();
 
