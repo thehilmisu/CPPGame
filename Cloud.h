@@ -10,10 +10,10 @@
 class Cloud
 {
 public:
-    Cloud(const std::string& modelPath, const std::string& texturePath,Vector3 startPosition, Vector3 size);
-    ~Cloud();
+    Cloud(Vector3 startPosition, float scale);
+    ~Cloud() = default;
 
-    void Update(float deltaTime, Vector3 targetPosition);
+    void Update(float deltaTime);
     void Draw();
 
     Vector3 GetPosition() const;
@@ -23,10 +23,11 @@ public:
 
 private:
     Model model;          // 3D model
-    Texture2D texture;    // Texture applied to the model
     Vector3 position;
-    Vector3 size;
+    float scale;
     bool active;
+
+    Vector3 GeneratePosition();
 };
 
 #endif // ENEMY_H

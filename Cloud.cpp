@@ -2,54 +2,54 @@
 #include "GameSettings.h"
 #include "GameUtilities.h"
 #include <iostream>
+#include <cstdlib>
 
 
-Cloud::Cloud(const std::string& modelPath, const std::string& texturePath,Vector3 startPosition, Vector3 size)
-    : position(startPosition), size(size), active(true)
+Cloud::Cloud(Vector3 startPosition, float scale)
+    : position(startPosition), scale(1.0f), active(true)
 {
-
      // Load the model
+    std::string modelPath = "assets/Clouds/Cloud_Polygon_Blender_1.obj";
     model = LoadModel(modelPath.c_str());
     if (model.meshCount == 0)
     {
         std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
     }
 
-    // Load the texture
-//    texture = LoadTexture(texturePath.c_str());
-//    if (texture.id == 0)
-//    {
-//        std::cerr << "Error: Failed to load texture from " << texturePath << std::endl;
-//    }
-//
-//    // Apply the texture to the model
-//    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-
-}
-
-Cloud::~Cloud()
-{
-    // Cleanup if necessary
+    position = GeneratePosition();
 }
 
 void Cloud::Unload()
 {
     UnloadModel(model);
-    UnloadTexture(texture);
-
 }
 
-void Cloud::Update(float deltaTime, Vector3 targetPosition)
+Vector3 Cloud::GeneratePosition()
 {
-   float smoothFactor = 2.0f * deltaTime;
-   position = Vector3MoveTowards(position, Vector3Lerp(position, targetPosition, smoothFactor), 2);
+  	 float cloudXMin = -50.0f, cloudXMax = 50.0f;
+     float cloudYMin = 15.0f, cloudYMax = 35.0f;
+
+      Vector3 generatedPosition;
+     generatedPosition.x = cloudXMin + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (cloudXMax - cloudXMin))); // Random x in range
+     generatedPosition.y = cloudYMin + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (cloudYMax - cloudYMin)));
+     generatedPosition.z = position.z - 50.0f; // Behind the player, modify as necessary
+     scale = 5.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 5.0f)); // Random size
+
+     return generatedPosition;
+}
+
+void Cloud::Update(float deltaTime)
+{
+   float smoothFactor = 0.02f * deltaTime;
+
+   position = Vector3MoveTowards(position, Vector3Lerp(position, (Vector3){position.x, position.y, 10.0f}, smoothFactor), 2);
 }
 
 void Cloud::Draw()
 {
     if(active)
     {
-        DrawModel(model, position, size.x, WHITE);
+        DrawModel(model, position, scale, WHITE);
     }
 }
 

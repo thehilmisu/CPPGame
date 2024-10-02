@@ -5,7 +5,7 @@
 #include "Enemy.h"
 #include "GameUtilities.h"
 #include "SimpleTerrain.h"
-#include "CloudManager.h"
+#include "Cloud.h"
 
 
 int main()
@@ -23,8 +23,11 @@ int main()
     player.SetScale(0.4f);
     player.SetFlipped(true);
 
-    float enemySpawnTimer = 0.0f;
-    std::vector<Enemy> enemies;
+    // float enemySpawnTimer = 0.0f;
+    // std::vector<Enemy> enemies;
+
+    float cloudSpawnTimer = 0.0f;
+    std::vector<Cloud> clouds;
 
 
     // Camera setup
@@ -45,7 +48,7 @@ int main()
         float deltaTime = GetFrameTime();
       
         // Move the player forward first
-        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+        //player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
 
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
@@ -59,12 +62,19 @@ int main()
         camera.target = player.GetPosition();
 
          // Update enemy spawning
-        enemySpawnTimer += deltaTime;
+        // enemySpawnTimer += deltaTime;
+        //
+        // if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
+        // {
+        //     enemySpawnTimer = 0.0f;
+        //     GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
+        // }
 
-        if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
-        {
-            enemySpawnTimer = 0.0f;
-            GameUtilities::SpawnEnemy(player.GetPosition(), enemies);
+        cloudSpawnTimer += deltaTime;
+        if(cloudSpawnTimer >+ 1.0f) {
+            cloudSpawnTimer = 0.0f;
+            Cloud cloud(player.GetPosition(), 1.0f);
+            clouds.push_back(cloud);
         }
 
         // Draw
@@ -79,13 +89,18 @@ int main()
                 // Draw the player
                 player.Draw();
                 
-                //Draw enemies
-                for(auto& enemy : enemies)
-                {
-                    enemy.Update(deltaTime, player.GetPosition());
-                    enemy.Draw();
-                }
+                // Draw enemies
+                // for(auto& enemy : enemies)
+                // {
+                //     enemy.Update(deltaTime, player.GetPosition());
+                //     enemy.Draw();
+                // }
 
+                // Draw clouds
+                for(auto& cloud : clouds) {
+                    cloud.Update(deltaTime);
+                    cloud.Draw();
+                }
 
             EndMode3D();
 
@@ -120,9 +135,13 @@ int main()
     // De-initialization
     player.Unload();
     simpleTerrain.Unload();
-    for(auto& i : enemies)
-        i.Unload();
-    enemies.clear();
+    // for(auto& i : enemies)
+    //     i.Unload();
+    // enemies.clear();
+    for(auto& cloud : clouds) {
+        cloud.Unload();
+    }
+    clouds.clear();
     CloseWindow();
 
     return 0;
