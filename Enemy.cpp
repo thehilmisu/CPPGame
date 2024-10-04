@@ -27,11 +27,6 @@ Enemy::Enemy(const std::string& modelPath, const std::string& texturePath,Vector
 
 }
 
-Enemy::~Enemy()
-{
-    // Cleanup if necessary
-}
-
 void Enemy::Unload()
 {
     UnloadModel(model);
@@ -39,7 +34,7 @@ void Enemy::Unload()
 
 }
 
-void Enemy::Update(float deltaTime, Vector3 targetPosition)
+void Enemy::Update(float deltaTime, const Vector3 targetPosition)
 {
    float smoothFactor = 2.0f * deltaTime;
    position = Vector3MoveTowards(position, Vector3Lerp(position, targetPosition, smoothFactor), 2);
