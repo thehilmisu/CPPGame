@@ -6,6 +6,7 @@
 #include "GameUtilities.h"
 #include "SimpleTerrain.h"
 #include "Cloud.h"
+#include "Tree.h"
 
 
 int main()
@@ -28,6 +29,9 @@ int main()
 
     float cloudSpawnTimer = 0.0f;
     std::vector<Cloud> clouds;
+
+    float treeSpawnTimer = 0.0f;
+    std::vector<Tree> trees;
 
 
     // Camera setup
@@ -77,6 +81,13 @@ int main()
             clouds.push_back(cloud);
         }
 
+        treeSpawnTimer += deltaTime;
+        if(treeSpawnTimer >+ 3.0f) {
+            treeSpawnTimer = 0.0f;
+            Tree tree(player.GetPosition(), 0.2f);
+            trees.push_back(tree);
+        }
+
         // Draw
         BeginDrawing();
             ClearBackground(SKYBLUE);
@@ -100,6 +111,11 @@ int main()
                 for(auto& cloud : clouds) {
                     cloud.Update(deltaTime);
                     cloud.Draw();
+                }
+
+                for(auto& tree : trees) {
+                    tree.Update(deltaTime);
+                    tree.Draw();
                 }
 
             EndMode3D();
