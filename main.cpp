@@ -7,6 +7,7 @@
 #include "SimpleTerrain.h"
 #include "Cloud.h"
 #include "Tree.h"
+#include "Missile.h"
 
 
 int main()
@@ -24,15 +25,18 @@ int main()
     player.SetScale(0.4f);
     player.SetFlipped(true);
 
-    // float enemySpawnTimer = 0.0f;
-    // std::vector<Enemy> enemies;
+    float enemySpawnTimer = 0.0f;
+    std::vector<Enemy> enemies;
 
+    Cloud::LoadModelFromResource();
     float cloudSpawnTimer = 0.0f;
     std::vector<Cloud> clouds;
 
+    Tree::LoadModelFromResource();
     float treeSpawnTimer = 0.0f;
     std::vector<Tree> trees;
 
+    //Missile missile ({ 0.0f, 20.0f, -25.0f }, 1.0f);
 
     // Camera setup
     Camera3D camera = { 0 };
@@ -42,6 +46,7 @@ int main()
     camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
+    SimpleTerrain::LoadTextureFromResource();
     SimpleTerrain simpleTerrain;
     simpleTerrain.LoadChunks(player.GetPosition());
 
@@ -52,7 +57,7 @@ int main()
         float deltaTime = GetFrameTime();
       
         // Move the player forward first
-        //player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
 
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
@@ -118,6 +123,8 @@ int main()
                     tree.Draw();
                 }
 
+               // missile.Draw();
+
             EndMode3D();
 
             // Draw UI elements...
@@ -151,13 +158,18 @@ int main()
     // De-initialization
     player.Unload();
     simpleTerrain.Unload();
-    // for(auto& i : enemies)
-    //     i.Unload();
-    // enemies.clear();
-    for(auto& cloud : clouds) {
-        cloud.Unload();
-    }
+    SimpleTerrain::UnloadStaticTexture();
+
+    for(auto& i : enemies)
+        i.Unload();
+    enemies.clear();
+
+    Cloud::Unload();
     clouds.clear();
+
+    Tree::Unload();
+    trees.clear();
+
     CloseWindow();
 
     return 0;

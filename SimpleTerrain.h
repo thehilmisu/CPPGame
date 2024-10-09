@@ -31,11 +31,13 @@ public:
     void Draw();
     void Unload();
 
+    static void LoadTextureFromResource();
+    static void UnloadStaticTexture();
     void LoadChunks(Vector3 playerPosition);
 
 private:
     Model terrainModel;
-    Texture2D terrainTexture;
+    static Texture2D terrainTexture;
     Image heightMap;
     Mesh terrainMesh;
     Vector3 heightMeshMap;

@@ -4,21 +4,24 @@
 #include <iostream>
 #include <cstdlib>
 
+Model Cloud::model;
 
 Cloud::Cloud(Vector3 startPosition, float scale)
     : position(startPosition), scale(1.0f), active(true)
 {
-     // Load the model
+    position = GeneratePosition();
+}
+
+void Cloud::LoadModelFromResource()
+{
+    // Load the model
     std::string modelPath = "assets/Clouds/Cloud_Polygon_Blender_1.obj";
     model = LoadModel(modelPath.c_str());
     if (model.meshCount == 0)
     {
         std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
     }
-
-    position = GeneratePosition();
 }
-
 void Cloud::Unload()
 {
     UnloadModel(model);

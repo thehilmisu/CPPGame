@@ -5,18 +5,22 @@
 #include <cstdlib>
 
 
-Tree::Tree(Vector3 startPosition, float scale)
-    : position(startPosition), scale(1.0f), active(true)
-{
-     // Load the model
-    std::string modelPath = "assets/Tree/Tree.obj";
-    model = LoadModel(modelPath.c_str());
-    if (model.meshCount == 0)
-    {
-        std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
-    }
+Model Tree::model;
 
+Tree::Tree(Vector3 startPosition, float scale)
+    : position(startPosition), scale(0.3f), active(true)
+{
     position = GeneratePosition();
+}
+
+void Tree::LoadModelFromResource()
+{
+  std::string modelPath = "assets/Tree/Lowpoly_tree_sample.obj";
+  model = LoadModel(modelPath.c_str());
+  if (model.meshCount == 0)
+  {
+    std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
+  }
 }
 
 void Tree::Unload()

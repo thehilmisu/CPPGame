@@ -2,14 +2,13 @@
 #include "GameUtilities.h"
 #include <cmath>
 
+Texture2D SimpleTerrain::terrainTexture;
 
 SimpleTerrain::SimpleTerrain() : heightMeshMap((Vector3){16.0f, 0.1f, 16.0f})
 {
-    //heightMap = LoadImage("assets/heightmap.png"); // Load your height map image
     terrainMesh = GenMeshHeightmap(heightMap, heightMeshMap); 
     terrainModel = LoadModelFromMesh(terrainMesh);
-    
-    terrainTexture = LoadTexture("assets/coast_sand_05_diff_4k.png"); // Optional texture for the terrain
+
     terrainModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrainTexture;
 }
 
@@ -17,6 +16,11 @@ SimpleTerrain::~SimpleTerrain()
 {
 
 }
+
+void SimpleTerrain::LoadTextureFromResource() {
+    terrainTexture = LoadTexture("assets/rocky_terrain_diff_4k.png");
+}
+
 
 void SimpleTerrain::Update(Vector3 playerPosition)
 {
@@ -101,14 +105,15 @@ void SimpleTerrain::SetHeightmap(Vector3 hMap)
 
 void SimpleTerrain::Unload()
 {
-    //UnloadModel(terrainModel);
-
     for(auto& chunk : terrainChunks){
         UnloadModel(chunk.model);
         UnloadTexture(chunk.texture);
     }
-        
-    UnloadTexture(terrainTexture);
+
     UnloadImage(heightMap);
     UnloadMesh(terrainMesh);
-} 
+}
+
+void SimpleTerrain::UnloadStaticTexture() {
+    UnloadTexture(terrainTexture);
+}

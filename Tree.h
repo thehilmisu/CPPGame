@@ -19,10 +19,12 @@ public:
     Vector3 GetPosition() const;
     bool IsActive() const;
     void Deactivate();
-    void Unload();
+
+    static void LoadModelFromResource();
+    static void Unload();
 
 private:
-    Model model;          // 3D model
+    static Model model;
     Vector3 position;
     float scale;
     bool active;
