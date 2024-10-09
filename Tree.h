@@ -1,11 +1,7 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include <string>
-
 #include "raylib.h"
-#include "raymath.h"
-#include <vector>
 
 class Tree
 {
@@ -20,11 +16,7 @@ public:
     bool IsActive() const;
     void Deactivate();
 
-    static void LoadModelFromResource();
-    static void Unload();
-
 private:
-    static Model model;
     Vector3 position;
     float scale;
     bool active;

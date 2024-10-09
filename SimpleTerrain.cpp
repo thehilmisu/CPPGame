@@ -18,7 +18,7 @@ SimpleTerrain::~SimpleTerrain()
 }
 
 void SimpleTerrain::LoadTextureFromResource() {
-    terrainTexture = LoadTexture("assets/rocky_terrain_diff_4k.png");
+    terrainTexture = LoadTexture("assets/coast_sand_05_diff_4k.png");
 }
 
 

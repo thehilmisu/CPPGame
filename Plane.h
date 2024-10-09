@@ -17,7 +17,7 @@ class Plane
 {
 public:
     // Constructor and Destructor
-    Plane(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition);
+    Plane(Vector3 startPosition);
     ~Plane();
 
     // Update and Draw methods
@@ -53,11 +53,7 @@ public:
     // Handling the user input
     void HandleInput(float deltaTime);
 
-    void Unload();
-
 private:
-    Model model;          // 3D model of the player
-    Texture2D texture;    // Texture applied to the model
     Vector3 position;     // Player position in the world
     Quaternion rotation;  // Player rotation
     float scale;          // Scale of the model

@@ -1,29 +1,11 @@
 #include "Plane.h"
 #include "GameSettings.h"
-#include <iostream>
+#include <ResourceManager.h>
 
-Plane::Plane(const std::string& modelPath, const std::string& texturePath, Vector3 startPosition)
+Plane::Plane(Vector3 startPosition)
     : position(startPosition), rotation(QuaternionIdentity()), scale(1.0f), isFlipped(true),
       flightInfo{0.0f, 0.0f, 0.0f, startPosition.y, 5.0f}
 {
-    // Load the model
-    model = LoadModel(modelPath.c_str());
-    if (model.meshCount == 0)
-    {
-        std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
-    }
-
-    // Load the texture
-    // texture = LoadTexture(texturePath.c_str());
-    // if (texture.id == 0)
-    // {
-    //     std::cerr << "Error: Failed to load texture from " << texturePath << std::endl;
-    // }
-    //
-    // // Apply the texture to the model
-    // model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-   
-
     // Initialize the transform
     UpdateRotation();
 }
@@ -153,13 +135,13 @@ void Plane::UpdateRotation()
     Matrix translationMat = MatrixTranslate(position.x, position.y, position.z);
 
     // Combine all transformations: translation * rotation * scaling
-    model.transform = MatrixMultiply(transformMat, translationMat);
+    ResourceManager::GetPlayerModel().transform = MatrixMultiply(transformMat, translationMat);
 }
 
 void Plane::Draw()
 {
     // Draw the model at the origin; transformations are applied via model.transform
-    DrawModel(model, { 0.0f, 0.0f, 0.0f }, 1.0f, WHITE);
+    DrawModel(ResourceManager::GetPlayerModel(), { 0.0f, 0.0f, 0.0f }, 1.0f, WHITE);
 }
 
 void Plane::Move(const Vector3& direction, float speed, float deltaTime)
@@ -167,10 +149,4 @@ void Plane::Move(const Vector3& direction, float speed, float deltaTime)
     Vector3 movement = Vector3Scale(direction, speed * deltaTime);
     position = Vector3Add(position, movement);
     UpdateRotation();
-}
-
-void Plane::Unload()
-{
-    UnloadModel(model);
-    UnloadTexture(texture);
 }

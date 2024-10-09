@@ -3,8 +3,8 @@
 #include "GameUtilities.h"
 #include <iostream>
 #include <cstdlib>
+#include "ResourceManager.h"
 
-Model Cloud::model;
 
 Cloud::Cloud(Vector3 startPosition, float scale)
     : position(startPosition), scale(1.0f), active(true)
@@ -12,20 +12,6 @@ Cloud::Cloud(Vector3 startPosition, float scale)
     position = GeneratePosition();
 }
 
-void Cloud::LoadModelFromResource()
-{
-    // Load the model
-    std::string modelPath = "assets/Clouds/Cloud_Polygon_Blender_1.obj";
-    model = LoadModel(modelPath.c_str());
-    if (model.meshCount == 0)
-    {
-        std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
-    }
-}
-void Cloud::Unload()
-{
-    UnloadModel(model);
-}
 
 Vector3 Cloud::GeneratePosition()
 {
@@ -52,7 +38,7 @@ void Cloud::Draw()
 {
     if(active)
     {
-        DrawModel(model, position, scale, WHITE);
+        DrawModel(ResourceManager::GetCloudModel(), position, scale, WHITE);
     }
 }
 

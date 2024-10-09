@@ -7,36 +7,35 @@
 #include "SimpleTerrain.h"
 #include "Cloud.h"
 #include "Tree.h"
-#include "Missile.h"
+#include "ResourceManager.h"
 
 
 int main()
 {
     // Initialization
-    const int screenWidth = 1080;
-    const int screenHeight = 720;
+    const int screenWidth = GetScreenWidth() / 2;
+    const int screenHeight = GetScreenHeight() / 2;
 
     InitWindow(screenWidth, screenHeight, WINDOW_NAME);
     SetTargetFPS(60);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
+    // Load all the resources
+    ResourceManager::LoadResources();
+
     // Create a player instance
-    Plane player(PLAYER_RAFALE_OBJ,"",{ 0.0f, 20.0f, 0.0f });
+    Plane player({ 0.0f, 20.0f, 0.0f });
     player.SetScale(0.4f);
     player.SetFlipped(true);
 
     float enemySpawnTimer = 0.0f;
     std::vector<Enemy> enemies;
 
-    Cloud::LoadModelFromResource();
     float cloudSpawnTimer = 0.0f;
     std::vector<Cloud> clouds;
 
-    Tree::LoadModelFromResource();
     float treeSpawnTimer = 0.0f;
     std::vector<Tree> trees;
-
-    //Missile missile ({ 0.0f, 20.0f, -25.0f }, 1.0f);
 
     // Camera setup
     Camera3D camera = { 0 };
@@ -156,20 +155,16 @@ int main()
     }
 
     // De-initialization
-    player.Unload();
     simpleTerrain.Unload();
     SimpleTerrain::UnloadStaticTexture();
 
-    for(auto& i : enemies)
-        i.Unload();
     enemies.clear();
 
-    Cloud::Unload();
     clouds.clear();
 
-    Tree::Unload();
     trees.clear();
 
+    ResourceManager::UnloadResources();
     CloseWindow();
 
     return 0;
