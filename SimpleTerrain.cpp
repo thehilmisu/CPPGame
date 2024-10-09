@@ -1,119 +1,119 @@
 #include "SimpleTerrain.h"
-#include "GameUtilities.h"
+#include "ResourceManager.h"
 #include <cmath>
+#include <vector>
 
-Texture2D SimpleTerrain::terrainTexture;
-
-SimpleTerrain::SimpleTerrain() : heightMeshMap((Vector3){16.0f, 0.1f, 16.0f})
-{
-    terrainMesh = GenMeshHeightmap(heightMap, heightMeshMap); 
-    terrainModel = LoadModelFromMesh(terrainMesh);
-
-    terrainModel.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrainTexture;
+SimpleTerrain::SimpleTerrain() : heightMeshMap({16.0f, 0.1f, 16.0f}) {
+    // Load the terrain texture using ResourceManager
+    ResourceManager::LoadTerrainTexture();
 }
 
-SimpleTerrain::~SimpleTerrain()
-{
-
+SimpleTerrain::~SimpleTerrain() {
+    //Unload();
 }
 
-void SimpleTerrain::LoadTextureFromResource() {
-    terrainTexture = LoadTexture("assets/coast_sand_05_diff_4k.png");
-}
-
-
-void SimpleTerrain::Update(Vector3 playerPosition)
-{
+void SimpleTerrain::Update(const Vector3& playerPosition) {
     static Vector3 lastPlayerPosition = { 0.0f, 0.0f, 0.0f };
-    if (fabs(playerPosition.x - lastPlayerPosition.x) > S_CHUNK_SIZE || 
+    if (fabs(playerPosition.x - lastPlayerPosition.x) > S_CHUNK_SIZE ||
         fabs(playerPosition.z - lastPlayerPosition.z) > S_CHUNK_SIZE) {
 
         LoadChunks(playerPosition);
+        UnloadFarChunks(playerPosition);
         lastPlayerPosition = playerPosition;
     }
 }
 
+void SimpleTerrain::LoadChunks(const Vector3& playerPosition) {
+    int playerChunkX = static_cast<int>(floor(playerPosition.x / S_CHUNK_SIZE));
+    int playerChunkZ = static_cast<int>(floor(playerPosition.z / S_CHUNK_SIZE));
 
-TerrainChunk SimpleTerrain::GenerateChunk(Vector3 chunkPosition) 
-{
-    TerrainChunk chunk;
+    for (int z = -S_VIEW_DISTANCE; z <= S_VIEW_DISTANCE; ++z) {
+        for (int x = -S_VIEW_DISTANCE; x <= S_VIEW_DISTANCE; ++x) {
+            int chunkX = playerChunkX + x;
+            int chunkZ = playerChunkZ + z;
+            std::string chunkKey = GetChunkKey(chunkX, chunkZ);
 
+            if (loadedChunks.find(chunkKey) == loadedChunks.end()) {
+                GenerateChunk(chunkX, chunkZ);
+                loadedChunks.insert(chunkKey);
+            }
+        }
+    }
+}
+
+void SimpleTerrain::UnloadFarChunks(const Vector3& playerPosition) {
+    int playerChunkX = static_cast<int>(floor(playerPosition.x / S_CHUNK_SIZE));
+    int playerChunkZ = static_cast<int>(floor(playerPosition.z / S_CHUNK_SIZE));
+
+    std::vector<std::string> chunksToUnload;
+
+    for (const auto& chunkKey : loadedChunks) {
+        int chunkX, chunkZ;
+        sscanf(chunkKey.c_str(), "%d_%d", &chunkX, &chunkZ);
+
+        int distanceX = abs(chunkX - playerChunkX);
+        int distanceZ = abs(chunkZ - playerChunkZ);
+
+        if (distanceX > S_VIEW_DISTANCE || distanceZ > S_VIEW_DISTANCE) {
+            chunksToUnload.push_back(chunkKey);
+        }
+    }
+
+    for (const auto& chunkKey : chunksToUnload) {
+        ResourceManager::RemoveTerrainModel(chunkKey);
+        //ResourceManager::RemoveTerrainMesh(chunkKey);
+        loadedChunks.erase(chunkKey);
+    }
+}
+
+
+void SimpleTerrain::GenerateChunk(int chunkX, int chunkZ) {
+    std::string chunkKey = GetChunkKey(chunkX, chunkZ);
+
+    // Generate heightmap image
     int resolution = 32;
-    heightMap = GenImagePerlinNoise(resolution, resolution,
-                                         chunkPosition.x * S_CHUNK_SIZE, chunkPosition.z * S_CHUNK_SIZE,
-                                         500.0f);  // Adjust scale for detail
+    float noiseScale = 0.1f;
+    Image heightMap = GenImagePerlinNoise(resolution, resolution,
+                                          chunkX * S_CHUNK_SIZE * noiseScale,
+                                          chunkZ * S_CHUNK_SIZE * noiseScale,
+                                          800.0f);
 
-    //heightMeshMap.y = 10.0f * GameUtilities::PerlinNoise(chunkPosition.x, chunkPosition.z);  // Scale the height value
+    // Generate mesh from heightmap
+    Mesh mesh = GenMeshHeightmap(heightMap, heightMeshMap);
+    UploadMesh(&mesh, false);
 
-    chunk.mesh = GenMeshHeightmap(heightMap, heightMeshMap);
-    UploadMesh(&chunk.mesh, false);
+    // Create model from mesh
+    Model model = LoadModelFromMesh(mesh);
+    model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = ResourceManager::GetTerrainTexture();
 
+    // Store model in ResourceManager
+    ResourceManager::AddTerrainModel(chunkKey, model);
 
-    chunk.model = LoadModelFromMesh(chunk.mesh);
-    chunk.position = chunkPosition;
-    chunk.texture = terrainTexture;
-    chunk.model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = chunk.texture;
-    chunk.active = true;
-
-    return chunk;
-}
-
-void SimpleTerrain::LoadChunks(Vector3 playerPosition) 
-{
-    terrainChunks.clear();
-    int playerChunkX = (int)floor(playerPosition.x / S_CHUNK_SIZE);
-    int playerChunkZ = (int)floor(playerPosition.z / S_CHUNK_SIZE);
-
-    //load chunks
-    for (int z = -S_VIEW_DISTANCE; z <= S_VIEW_DISTANCE; z++) {
-        for (int x = -S_VIEW_DISTANCE; x <= S_VIEW_DISTANCE; x++) {
-            Vector3 chunkPos = {(float)(playerChunkX + x) * S_CHUNK_SIZE, 0.0f, (float)(playerChunkZ + z) * S_CHUNK_SIZE};
-            TerrainChunk chunk = GenerateChunk(chunkPos);
-            terrainChunks.push_back(chunk);
-        }
-    }
-
-    for (int i = terrainChunks.size() - 1; i >= 0; i--)
-    {
-        int distanceX = std::abs(terrainChunks.at(i).position.x / S_CHUNK_SIZE - playerChunkX);
-        int distanceZ = std::abs(terrainChunks.at(i).position.z / S_CHUNK_SIZE - playerChunkZ);
-
-        if (distanceX > S_VIEW_DISTANCE || distanceZ > S_VIEW_DISTANCE)
-        {
-            UnloadModel(terrainChunks.at(i).model);
-            UnloadTexture(terrainChunks.at(i).texture);
-            
-            // Erase the chunk from the vector
-            terrainChunks.erase(terrainChunks.begin() + i);
-        }
-    }
-
-
-}
-
-void SimpleTerrain::Draw()
-{
-    for (auto& chunk : terrainChunks) {
-        DrawModel(chunk.model, chunk.position, 1.1f, WHITE);
-    }
-}
-
-void SimpleTerrain::SetHeightmap(Vector3 hMap)
-{
-    heightMeshMap = hMap;
-}
-
-void SimpleTerrain::Unload()
-{
-    for(auto& chunk : terrainChunks){
-        UnloadModel(chunk.model);
-        UnloadTexture(chunk.texture);
-    }
-
+    // Clean up
     UnloadImage(heightMap);
-    UnloadMesh(terrainMesh);
 }
 
-void SimpleTerrain::UnloadStaticTexture() {
-    UnloadTexture(terrainTexture);
+
+void SimpleTerrain::Draw() {
+    for (const auto& chunkKey : loadedChunks) {
+        int chunkX, chunkZ;
+        sscanf(chunkKey.c_str(), "%d_%d", &chunkX, &chunkZ);
+        Vector3 position = { chunkX * S_CHUNK_SIZE, 0.0f, chunkZ * S_CHUNK_SIZE };
+
+        Model& model = ResourceManager::GetTerrainModel(chunkKey);
+        DrawModel(model, position, 1.0f, WHITE);
+    }
+}
+
+void SimpleTerrain::Unload() {
+    static bool unloaded = false;
+    if (!unloaded) {
+        ResourceManager::UnloadAllTerrainResources();
+        ResourceManager::UnloadTerrainTexture();
+        unloaded = true;
+    }
+}
+
+std::string SimpleTerrain::GetChunkKey(int chunkX, int chunkZ) {
+    return std::to_string(chunkX) + "_" + std::to_string(chunkZ);
 }

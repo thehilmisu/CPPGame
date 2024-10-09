@@ -1,52 +1,31 @@
-// SimpleTerrain.h
-
-#ifndef SIMPLETERRAIN_H
-#define SIMPLETERRAIN_H
+#pragma once
 
 #include "raylib.h"
-#include <vector>
-
+#include <unordered_set>
+#include <string>
 
 #define S_CHUNK_SIZE 16     // Size of each chunk in units
 #define S_VIEW_DISTANCE 6   // Number of chunks to load around the player
 
-
-struct TerrainChunk {
-    Mesh mesh;
-    Model model;
-    Texture2D texture;
-    Vector3 position;
-    bool active;
-};
-
 class SimpleTerrain {
-
 public: 
     SimpleTerrain();
     ~SimpleTerrain();
 
-    void SetHeightmap(Vector3 hMap);
-
-    void Update(Vector3 playerPosition);
+    void Update(const Vector3& playerPosition);
     void Draw();
     void Unload();
 
-    static void LoadTextureFromResource();
-    static void UnloadStaticTexture();
-    void LoadChunks(Vector3 playerPosition);
-
 private:
-    Model terrainModel;
-    static Texture2D terrainTexture;
-    Image heightMap;
-    Mesh terrainMesh;
+    // No need for terrainModel or terrainMesh here
     Vector3 heightMeshMap;
-    std::vector<TerrainChunk> terrainChunks;
 
-    TerrainChunk GenerateChunk(Vector3 chunkPosition);
-    
+    // Keep track of loaded chunk keys
+    std::unordered_set<std::string> loadedChunks;
 
-
+    // Helper methods
+    void LoadChunks(const Vector3& playerPosition);
+    void UnloadFarChunks(const Vector3& playerPosition);
+    void GenerateChunk(int chunkX, int chunkZ);
+    std::string GetChunkKey(int chunkX, int chunkZ);
 };
-
-#endif

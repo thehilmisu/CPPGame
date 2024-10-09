@@ -10,6 +10,9 @@ Model ResourceManager::cloudModel = { 0 };
 Model ResourceManager::missileModel = { 0 };
 Model ResourceManager::bulletModel = { 0 };
 
+Texture2D ResourceManager::terrainTexture = { 0 };
+std::unordered_map<std::string, Model> ResourceManager::terrainModels;
+
 void ResourceManager::LoadResources() {
     // Load models
     playerModel = LoadModelFromFile(PLAYER_RAFALE_OBJ);
@@ -20,15 +23,6 @@ void ResourceManager::LoadResources() {
     bulletModel = LoadModelFromFile("assets/Bullet/bullet.obj");
 }
 
-void ResourceManager::UnloadResources() {
-    // Unload models
-    UnloadModel(playerModel);
-    UnloadModel(enemyModel);
-    UnloadModel(treeModel);
-    UnloadModel(cloudModel);
-    UnloadModel(missileModel);
-    UnloadModel(bulletModel);
-}
 
 Model& ResourceManager::GetPlayerModel() {
     return playerModel;
@@ -61,4 +55,57 @@ Model ResourceManager::LoadModelFromFile(const std::string& filePath) {
         // Handle error appropriately, e.g., load a placeholder model or exit
     }
     return model;
+}
+
+
+void ResourceManager::LoadTerrainTexture() {
+    terrainTexture = LoadTexture("assets/coast_sand_05_diff_4k.png");
+    if (terrainTexture.id == 0) {
+        std::cerr << "Error: Failed to load terrain texture." << std::endl;
+    }
+}
+
+void ResourceManager::UnloadTerrainTexture() {
+    UnloadTexture(terrainTexture);
+}
+
+Texture2D& ResourceManager::GetTerrainTexture() {
+    return terrainTexture;
+}
+
+void ResourceManager::RemoveTerrainModel(const std::string& key) {
+    if (terrainModels.count(key)) {
+        UnloadModel(terrainModels[key]);
+        terrainModels.erase(key);
+    }
+}
+
+
+// Add, get, and remove terrain models
+void ResourceManager::AddTerrainModel(const std::string& key, const Model& model) {
+    terrainModels[key] = model;
+}
+
+Model& ResourceManager::GetTerrainModel(const std::string& key) {
+    return terrainModels.at(key);
+}
+
+
+// Unload all terrain resources
+void ResourceManager::UnloadAllTerrainResources() {
+    for (auto& pair : terrainModels) {
+        UnloadModel(pair.second);
+    }
+    terrainModels.clear();
+}
+
+
+void ResourceManager::UnloadResources() {
+    // Unload models
+    UnloadModel(playerModel);
+    UnloadModel(enemyModel);
+    UnloadModel(treeModel);
+    UnloadModel(cloudModel);
+    UnloadModel(missileModel);
+    UnloadModel(bulletModel);
 }

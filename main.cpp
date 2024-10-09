@@ -45,9 +45,7 @@ int main()
     camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    SimpleTerrain::LoadTextureFromResource();
     SimpleTerrain simpleTerrain;
-    simpleTerrain.LoadChunks(player.GetPosition());
 
     // Main game loop
     while (!WindowShouldClose())
@@ -156,7 +154,6 @@ int main()
 
     // De-initialization
     simpleTerrain.Unload();
-    SimpleTerrain::UnloadStaticTexture();
 
     enemies.clear();
 
