@@ -8,6 +8,8 @@
 #include "Cloud.h"
 #include "Tree.h"
 #include "ResourceManager.h"
+#include "Missile.h"
+#include "StaticTerrain.h"
 
 
 int main()
@@ -25,7 +27,7 @@ int main()
 
     // Create a player instance
     Plane player({ 0.0f, 20.0f, 0.0f });
-    player.SetScale(0.4f);
+    player.SetScale(0.2f);
     player.SetFlipped(true);
 
     float enemySpawnTimer = 0.0f;
@@ -45,7 +47,13 @@ int main()
     camera.fovy = 65.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
+    float randomHeightCounter = 0.0f;
     SimpleTerrain simpleTerrain;
+
+    // StaticTerrain terrain;
+    // terrain.GenerateTerrain(512, 512, 20.0f);
+
+    Missile test({0.0f, 20.0f, -50.0f}, 1.0f);
 
     // Main game loop
     while (!WindowShouldClose())
@@ -60,14 +68,19 @@ int main()
         player.Update(deltaTime);
 
         //update the terrain
+        randomHeightCounter += deltaTime;
+        if (randomHeightCounter > GameUtilities::GenerateRandomFloat(3.0f, 10.0f )) {
+            randomHeightCounter = 0.0f;
+            //simpleTerrain.SetHeightMeshMap((Vector3){16.0f, GameUtilities::GenerateRandomFloat(0.1f, 2.0f), 16.0f});
+        }
         simpleTerrain.Update(player.GetPosition());
 
         // Update the camera to follow the player without smoothing
-        Vector3 cameraOffset = { 0.0f, -5.0f, -15.0f };
+        Vector3 cameraOffset = { 0.0f, -25.0f, -15.0f };
         camera.position = Vector3Subtract(player.GetPosition(), cameraOffset);
         camera.target = player.GetPosition();
 
-         // Update enemy spawning
+        // Update enemy spawning
         // enemySpawnTimer += deltaTime;
         //
         // if (enemySpawnTimer >= ENEMY_SPAWN_INTERVAL)
@@ -77,18 +90,20 @@ int main()
         // }
 
         cloudSpawnTimer += deltaTime;
-        if(cloudSpawnTimer >+ 1.0f) {
+        if(cloudSpawnTimer >= 0.7f) {
             cloudSpawnTimer = 0.0f;
             Cloud cloud(player.GetPosition(), 1.0f);
             clouds.push_back(cloud);
         }
 
         treeSpawnTimer += deltaTime;
-        if(treeSpawnTimer >+ 3.0f) {
+        if(treeSpawnTimer >= 0.7f) {
             treeSpawnTimer = 0.0f;
             Tree tree(player.GetPosition(), 0.2f);
             trees.push_back(tree);
         }
+
+        //test.Update(deltaTime);
 
         // Draw
         BeginDrawing();
@@ -98,16 +113,18 @@ int main()
 
                 // Draw Terrain
                 simpleTerrain.Draw();
+                //terrain.Draw();
+
 
                 // Draw the player
                 player.Draw();
                 
                 // Draw enemies
-                // for(auto& enemy : enemies)
-                // {
-                //     enemy.Update(deltaTime, player.GetPosition());
-                //     enemy.Draw();
-                // }
+                for(auto& enemy : enemies)
+                {
+                    enemy.Update(deltaTime, player.GetPosition());
+                    enemy.Draw();
+                }
 
                 // Draw clouds
                 for(auto& cloud : clouds) {
@@ -120,24 +137,25 @@ int main()
                     tree.Draw();
                 }
 
-               // missile.Draw();
+                //test.Draw();
 
             EndMode3D();
 
             // Draw UI elements...
-            FlightInfo info = player.GetFlightInfo();
-            DrawRectangle(5, 45, 250, 110, Fade(SKYBLUE, 0.5f));
-            DrawRectangleLines(5, 45, 250, 110, BLUE);
+            auto [pitch, yaw, roll, altitude, speed] = player.GetFlightInfo();
+
+            DrawRectangle(5, 45, 250, 110, Fade(GREEN, 0.5f));
+            DrawRectangleLines(5, 45, 250, 110, DARKGREEN);
             char buffer[128];
-            sprintf(buffer, "Speed: %.2f units/s", info.speed);
+            sprintf(buffer, "Speed: %.2f units/s", speed);
             DrawText(buffer, 10, 50, 15, BLACK);
-            sprintf(buffer, "Altitude: %f ", info.altitude);
+            sprintf(buffer, "Altitude: %f ", altitude);
             DrawText(buffer, 10, 70, 15, BLACK);
-            sprintf(buffer, "Pitch: %f ", info.pitch);
+            sprintf(buffer, "Pitch: %f ", pitch);
             DrawText(buffer, 10, 90, 15, BLACK);
-            sprintf(buffer, "Roll: %f ", info.roll);
+            sprintf(buffer, "Roll: %f ", roll);
             DrawText(buffer, 10, 110, 15, BLACK);
-            sprintf(buffer, "Yaw: %f ", info.yaw);
+            sprintf(buffer, "Yaw: %f ", yaw);
             DrawText(buffer, 10, 130, 15, BLACK);
 
             sprintf(buffer, "Plane : %f, %f, %f", player.GetPosition().x,player.GetPosition().y,player.GetPosition().z);
@@ -154,6 +172,7 @@ int main()
 
     // De-initialization
     simpleTerrain.Unload();
+    //terrain.Unload();
 
     enemies.clear();
 

@@ -5,7 +5,7 @@
 #include <string>
 
 #define S_CHUNK_SIZE 16     // Size of each chunk in units
-#define S_VIEW_DISTANCE 6   // Number of chunks to load around the player
+#define S_VIEW_DISTANCE 12   // Number of chunks to load around the player
 
 class SimpleTerrain {
 public: 
@@ -16,8 +16,9 @@ public:
     void Draw();
     void Unload();
 
+    void SetHeightMeshMap(Vector3 heightMap);
+
 private:
-    // No need for terrainModel or terrainMesh here
     Vector3 heightMeshMap;
 
     // Keep track of loaded chunk keys

@@ -19,7 +19,7 @@ Vector3 Tree::GeneratePosition()
      Vector3 generatedPosition;
      generatedPosition.x = cloudXMin + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (cloudXMax - cloudXMin))); // Random x in range
      generatedPosition.y = 0.0f;//cloudYMin + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (cloudYMax - cloudYMin)));
-     generatedPosition.z = position.z - 50.0f; // Behind the player, modify as necessary
+     generatedPosition.z = position.z - 150.0f; // Behind the player, modify as necessary
      scale = scale;//5.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 5.0f)); // Random size
 
      return generatedPosition;

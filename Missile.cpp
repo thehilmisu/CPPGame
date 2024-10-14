@@ -1,6 +1,7 @@
 #include "Missile.h"
 #include "GameSettings.h"
 #include "GameUtilities.h"
+#include "ResourceManager.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -9,20 +10,16 @@ Missile::Missile(Vector3 startPosition, float scale)
     : position(startPosition), scale(1.0f), active(true)
 {
      // Load the model
-//    std::string modelPath = "assets/Missile/AIM120D.obj";
-//    model = LoadModel(modelPath.c_str());
-//    if (model.meshCount == 0)
-//    {
-//        std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
-//    }
+    std::string modelPath = "assets/SnowyTerrain/SnowyTerrain.obj";
+    model = LoadModel(modelPath.c_str());
+    if (model.meshCount == 0)
+    {
+        std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
+    }
 
     //position = GeneratePosition();
 }
 
-void Missile::Unload()
-{
-    UnloadModel(model);
-}
 
 Vector3 Missile::GeneratePosition()
 {

@@ -10,7 +10,7 @@
 class Enemy
 {
 public:
-    Enemy(const std::string& modelPath, const std::string& texturePath,Vector3 startPosition, Vector3 size);
+    Enemy(Vector3 startPosition, Vector3 size);
     ~Enemy() = default;
 
     void Update(float deltaTime, const Vector3 targetPosition);
@@ -19,11 +19,8 @@ public:
     Vector3 GetPosition() const;
     bool IsActive() const;
     void Deactivate();
-    void Unload();
 
 private:
-    Model model;          // 3D model
-    Texture2D texture;    // Texture applied to the model
     Vector3 position;
     Vector3 size;
     bool active;

@@ -3,6 +3,7 @@
 
 #include "raylib.h"
 #include <vector>
+#include <random>
 #include "Enemy.h"
 #include "GameSettings.h"
 
@@ -54,7 +55,7 @@ public:
         Vector3 enemySize = { ENEMY_SIZE, ENEMY_SIZE, ENEMY_SIZE };
 
         // Create a new enemy and add it to the list
-        enemies.emplace_back(ENEMY_OBJ,ENEMY_TEXTURE,spawnPosition, enemySize);
+        enemies.emplace_back(spawnPosition, enemySize);
     }
 
     static float CalculateDistance(const Vector3& a, const Vector3& b)
@@ -70,6 +71,19 @@ public:
     static float fractalNoise(float x, float z) {
         return PerlinNoise(x, z) * 10.0f + PerlinNoise(x * 2, z * 2) * 5.0f + PerlinNoise(x * 4, z * 4) * 2.5f;
     }
+
+    static float GenerateRandomFloat(float min, float max) {
+        // Ensure that min is less than max
+        if (min > max) std::swap(min, max);
+
+        // Static random engine and distribution to maintain state across calls
+        static std::random_device rd;                           // Seed for the random number engine
+        static std::mt19937 generator(rd());                    // Mersenne Twister engine
+        std::uniform_real_distribution<float> distribution(min, max); // Distribution range
+
+        return distribution(generator);
+    }
+
 
 };
 

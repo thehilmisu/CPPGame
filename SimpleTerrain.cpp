@@ -3,14 +3,20 @@
 #include <cmath>
 #include <vector>
 
-SimpleTerrain::SimpleTerrain() : heightMeshMap({16.0f, 0.1f, 16.0f}) {
+SimpleTerrain::SimpleTerrain() : heightMeshMap({16.0f, 0.5f, 16.0f}) {
     // Load the terrain texture using ResourceManager
     ResourceManager::LoadTerrainTexture();
+    LoadChunks((Vector3){0.0f, 0.0f, 0.0f});
 }
 
 SimpleTerrain::~SimpleTerrain() {
     //Unload();
 }
+
+void SimpleTerrain::SetHeightMeshMap(Vector3 heightMap) {
+    heightMeshMap = heightMap;
+}
+
 
 void SimpleTerrain::Update(const Vector3& playerPosition) {
     static Vector3 lastPlayerPosition = { 0.0f, 0.0f, 0.0f };
@@ -61,7 +67,6 @@ void SimpleTerrain::UnloadFarChunks(const Vector3& playerPosition) {
 
     for (const auto& chunkKey : chunksToUnload) {
         ResourceManager::RemoveTerrainModel(chunkKey);
-        //ResourceManager::RemoveTerrainMesh(chunkKey);
         loadedChunks.erase(chunkKey);
     }
 }
@@ -74,13 +79,13 @@ void SimpleTerrain::GenerateChunk(int chunkX, int chunkZ) {
     int resolution = 32;
     float noiseScale = 0.1f;
     Image heightMap = GenImagePerlinNoise(resolution, resolution,
-                                          chunkX * S_CHUNK_SIZE * noiseScale,
-                                          chunkZ * S_CHUNK_SIZE * noiseScale,
-                                          800.0f);
+                                          (float)chunkX * S_CHUNK_SIZE * noiseScale,
+                                          (float)chunkZ * S_CHUNK_SIZE * noiseScale,
+                                          8.0f);
 
     // Generate mesh from heightmap
     Mesh mesh = GenMeshHeightmap(heightMap, heightMeshMap);
-    UploadMesh(&mesh, false);
+    UploadMesh(&mesh, true);
 
     // Create model from mesh
     Model model = LoadModelFromMesh(mesh);
@@ -98,10 +103,10 @@ void SimpleTerrain::Draw() {
     for (const auto& chunkKey : loadedChunks) {
         int chunkX, chunkZ;
         sscanf(chunkKey.c_str(), "%d_%d", &chunkX, &chunkZ);
-        Vector3 position = { chunkX * S_CHUNK_SIZE, 0.0f, chunkZ * S_CHUNK_SIZE };
+        Vector3 position = { (float)chunkX * S_CHUNK_SIZE, 0.0f, (float)chunkZ * S_CHUNK_SIZE };
 
         Model& model = ResourceManager::GetTerrainModel(chunkKey);
-        DrawModel(model, position, 1.0f, WHITE);
+        DrawModel(model, position, 2.0f, WHITE);
     }
 }
 

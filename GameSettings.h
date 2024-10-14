@@ -11,6 +11,7 @@
 #define     MIN_ROLL_PITCH_VALUE    -35.0f
 #define     MAX_ROLL_PITCH_VALUE    +35.0f
 #define     ROLL_PITCH_CONSTANT      60.0f
+#define     PLAYER_SPEED_VALUE      6.0f
 
 
 
