@@ -23,6 +23,7 @@ void SimpleTerrain::Update(const Vector3& playerPosition) {
     if (fabs(playerPosition.x - lastPlayerPosition.x) > S_CHUNK_SIZE ||
         fabs(playerPosition.z - lastPlayerPosition.z) > S_CHUNK_SIZE) {
 
+
         LoadChunks(playerPosition);
         UnloadFarChunks(playerPosition);
         lastPlayerPosition = playerPosition;

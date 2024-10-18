@@ -9,6 +9,33 @@
 
 class GameUtilities{
 public:
+    static Quaternion RotateTowardsMousePosition(Vector3 position, Camera3D camera) {
+        // Get the mouse position in screen coordinates
+        Vector2 mousePos = GetMousePosition();
+
+        // Calculate a ray from the camera to the mouse position in world space
+        Ray mouseRay = GetMouseRay(mousePos, camera);
+
+        // Calculate the direction vector from the object position to the mouse ray position
+        Vector3 direction = Vector3Subtract(mouseRay.position, position);
+
+        // Normalize the direction vector
+        direction = Vector3Normalize(direction);
+
+        // Calculate the up vector for the rotation
+        Vector3 up = { 0.0f, 1.0f, 0.0f }; // Assuming Y is up in the world
+
+        // Calculate the rotation axis using cross product
+        Vector3 rotationAxis = Vector3CrossProduct(up, direction);
+
+        // Calculate the angle to rotate (use dot product to get the angle)
+        float angle = acosf(Vector3DotProduct(up, direction));
+
+        // Generate the quaternion for rotation around the axis
+        Quaternion rotation = QuaternionFromAxisAngle(rotationAxis, angle);
+
+        return rotation;
+    }
     static void DrawInfiniteGrid(float spacing, Vector3 centerPosition)
     {
         int lines = 100; // Number of lines to draw on each side
