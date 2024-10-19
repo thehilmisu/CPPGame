@@ -2,30 +2,20 @@
 #define CLOUD_H
 
 #include <string>
-
-#include "raylib.h"
+#include "GameObject.h"
 #include "raymath.h"
 #include <vector>
 
-class Cloud
+class Cloud : public GameObject
 {
 public:
     Cloud(Vector3 startPosition, float scale);
-    ~Cloud() = default;
 
-    void Update(float deltaTime);
-    void Draw();
-
-    Vector3 GetPosition() const;
-    bool IsActive() const;
-    void Deactivate();
+    virtual void Update(float deltaTime) override;
+    virtual void Draw() override;
 
 private:
-    Vector3 position;
-    float scale;
-    bool active;
-
-    Vector3 GeneratePosition();
+    void GeneratePosition();
 };
 
-#endif // ENEMY_H
+#endif // CLOUD_H

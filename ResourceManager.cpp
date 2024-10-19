@@ -19,7 +19,7 @@ void ResourceManager::LoadResources() {
     enemyModel = LoadModelFromFile("assets/Enemy/enemy.obj");
     treeModel = LoadModelFromFile("assets/Tree/Tree.obj");
     cloudModel = LoadModelFromFile("assets/Clouds/Cloud_Polygon_Blender_1.obj");
-    missileModel = LoadModelFromFile("assets/Missile/missile.obj");
+    missileModel = LoadModelFromFile("assets/Missile/Missile AGM-65.obj");
     bulletModel = LoadModelFromFile("assets/Bullet/bullet.obj");
 }
 

@@ -53,7 +53,7 @@ int main()
     //StaticTerrain terrain;
     //terrain.GenerateTerrain(512, 512, 20.0f);
 
-    Missile test({0.0f, 20.0f, -50.0f}, 1.0f);
+    Missile missile({0.0f, 20.0f, -50.0f}, 1.0f);
 
     // Main game loop
     while (!WindowShouldClose())
@@ -62,7 +62,7 @@ int main()
         float deltaTime = GetFrameTime();
       
         // Move the player forward first
-        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+        //player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
 
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
@@ -92,7 +92,7 @@ int main()
         cloudSpawnTimer += deltaTime;
         if(cloudSpawnTimer >= 0.7f) {
             cloudSpawnTimer = 0.0f;
-            Cloud cloud(player.GetPosition(), 1.0f);
+            Cloud cloud(player.GetPosition(), 3.0f);
             clouds.push_back(cloud);
         }
 
@@ -135,7 +135,7 @@ int main()
                     tree.Draw();
                 }
 
-                //test.Draw();
+                missile.Draw();
 
             EndMode3D();
 
