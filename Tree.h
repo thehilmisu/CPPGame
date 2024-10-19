@@ -1,27 +1,18 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "raylib.h"
+#include "GameObject.h"
 
-class Tree
+class Tree : public GameObject
 {
 public:
     Tree(Vector3 startPosition, float scale);
-    ~Tree() = default;
-
-    void Update(float deltaTime);
-    void Draw();
-
-    Vector3 GetPosition() const;
-    bool IsActive() const;
-    void Deactivate();
+	
+    virtual void Update(float deltaTime) override;
+    virtual void Draw() override;
 
 private:
-    Vector3 position;
-    float scale;
-    bool active;
-
-    Vector3 GeneratePosition();
+    void GeneratePosition();
 };
 
 #endif // Tree

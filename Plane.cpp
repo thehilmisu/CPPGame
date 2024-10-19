@@ -68,7 +68,6 @@ void Plane::HandleInput(float deltaTime)
         else if (flightInfo.pitch < -3.0f) flightInfo.pitch += ROLL_PITCH_CONSTANT * deltaTime;
     }
 
-
     // Adjust roll (Z-axis rotation) and horizontal movement
     float turningValue = 0.0f;
     if (IsKeyDown(KEY_LEFT)) { 

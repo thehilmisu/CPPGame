@@ -12,7 +12,6 @@ Cloud::Cloud(Vector3 startPosition, float scale)
     position = GeneratePosition();
 }
 
-
 Vector3 Cloud::GeneratePosition()
 {
   	 float cloudXMin = -50.0f, cloudXMax = 50.0f;

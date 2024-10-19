@@ -15,7 +15,7 @@ Missile::Missile(Vector3 startPosition, float scale)
     if (model.meshCount == 0)
     {
         std::cerr << "Error: Failed to load model from " << modelPath << std::endl;
-    }
+	}
 
     //position = GeneratePosition();
 }

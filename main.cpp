@@ -24,7 +24,7 @@ int main()
 
     // Load all the resources
     ResourceManager::LoadResources();
-
+	
     // Create a player instance
     Plane player({ 0.0f, 20.0f, 0.0f });
     player.SetScale(0.2f);
@@ -50,8 +50,8 @@ int main()
     float randomHeightCounter = 0.0f;
     SimpleTerrain simpleTerrain;
 
-    // StaticTerrain terrain;
-    // terrain.GenerateTerrain(512, 512, 20.0f);
+    //StaticTerrain terrain;
+    //terrain.GenerateTerrain(512, 512, 20.0f);
 
     Missile test({0.0f, 20.0f, -50.0f}, 1.0f);
 
@@ -99,11 +99,9 @@ int main()
         treeSpawnTimer += deltaTime;
         if(treeSpawnTimer >= 0.7f) {
             treeSpawnTimer = 0.0f;
-            Tree tree(player.GetPosition(), 0.2f);
-            trees.push_back(tree);
+            Tree tree(player.GetPosition(), 1.0f);
+			trees.push_back(tree);
         }
-
-        //test.Update(deltaTime);
 
         // Draw
         BeginDrawing();
