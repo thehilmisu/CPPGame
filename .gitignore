@@ -1,7 +1,9 @@
+
+
+# Directories
 build/
-
 .vscode/
-
 .idea/
 
+# Files
 *.swp
