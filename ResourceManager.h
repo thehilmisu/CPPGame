@@ -28,7 +28,6 @@ public:
     static Texture2D& GetTerrainTexture();
 
     // Methods to manage models
-
     static void AddTerrainModel(const std::string& key, const Model& model);
     static Model& GetTerrainModel(const std::string& key);
     static void RemoveTerrainModel(const std::string& key);

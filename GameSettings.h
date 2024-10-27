@@ -29,10 +29,4 @@
 #define ENEMY_SPAWN_RANGE_Y         10.0f
 
 
-
-class GameSettings{
-public:
-    
-};
-
 #endif
