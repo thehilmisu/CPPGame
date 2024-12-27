@@ -9,6 +9,7 @@ TARGET := FlightMania
 SRCDIR := .
 BUILDDIR := build
 INCDIR := $(SRCDIR)
+SPDDIR := thirdparty/spdlog/include
 
 # Find all .cpp files in the source directory
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
@@ -17,7 +18,7 @@ SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(patsubst $(SRCDIR)/%.cpp, $(BUILDDIR)/%.o, $(SOURCES))
 
 # raylib includes and libraries
-INCLUDES := -I$(INCDIR)
+INCLUDES := -I$(INCDIR) -I$(SPDDIR)
 LIBDIRS :=
 
 # Compiler flags

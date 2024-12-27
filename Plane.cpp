@@ -1,6 +1,6 @@
 #include "Plane.h"
 #include "GameSettings.h"
-#include <ResourceManager.h>
+#include "ResourceManager.h"
 
 Plane::Plane(Vector3 startPosition)
     : position(startPosition), rotation(QuaternionIdentity()), scale(1.0f), isFlipped(true),

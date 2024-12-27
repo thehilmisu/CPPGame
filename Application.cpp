@@ -1,6 +1,7 @@
 #include "raylib.h"
 
 #include "Application.h"
+#include <raymath.h>
 #include <vector>
 #include <memory>
 #include "Plane.h"
@@ -47,17 +48,14 @@ void Application::Run()
 
     // Camera setup
     Camera3D camera = { 0 };
-    camera.position = (Vector3){ 0.0f, 25.0f, -15.0f }; // Initial position
+    camera.position = (Vector3){ 0.0f, 35.0f, -5.0f }; // Initial position
     camera.target = player.GetPosition();
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 65.0f;
+    camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
     float randomHeightCounter = 0.0f;
     SimpleTerrain simpleTerrain;
-
-    //StaticTerrain terrain;
-    //terrain.GenerateTerrain(512, 512, 20.0f);
 
     // Main game loop
     while (!WindowShouldClose())
@@ -66,8 +64,8 @@ void Application::Run()
         float deltaTime = GetFrameTime();
       
         // Move the player forward first
-        //player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
-
+        player.Move({ 0.0f, 0.0f, -1.0f }, 5.0f, deltaTime);
+        
         // Update the player (apply input, rotation, etc.)
         player.Update(deltaTime);
 
@@ -75,14 +73,14 @@ void Application::Run()
         randomHeightCounter += deltaTime;
         if (randomHeightCounter > GameUtilities::GenerateRandomFloat(3.0f, 10.0f )) {
             randomHeightCounter = 0.0f;
-            //simpleTerrain.SetHeightMeshMap((Vector3){16.0f, GameUtilities::GenerateRandomFloat(0.1f, 2.0f), 16.0f});
+            simpleTerrain.SetHeightMeshMap((Vector3){16.0f, GameUtilities::GenerateRandomFloat(0.1f, 2.0f), 16.0f});
         }
         simpleTerrain.Update(player.GetPosition());
 
         // Update the camera to follow the player without smoothing
-        Vector3 cameraOffset = { 0.0f, -25.0f, -15.0f };
+        Vector3 cameraOffset = { 0.0f, -35.0f, -1.0f };
         camera.position = Vector3Subtract(player.GetPosition(), cameraOffset);
-        camera.target = player.GetPosition();
+        camera.target = Vector3Subtract(player.GetPosition(), {0.0f, 0.0f, 7.0f});
 
         // Update enemy spawning
         // enemySpawnTimer += deltaTime;
@@ -170,7 +168,7 @@ void Application::Run()
 
     // De-initialization
     simpleTerrain.Unload();
-
+    
     enemies.clear();
 
     clouds.clear();

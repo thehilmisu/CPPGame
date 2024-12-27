@@ -1,7 +1,7 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-
+#include <spdlog/spdlog.h>
 
 class Application
 {
